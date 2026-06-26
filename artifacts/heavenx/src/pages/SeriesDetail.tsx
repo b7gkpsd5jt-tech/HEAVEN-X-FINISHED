@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "wouter";
-import { apiFetch, API_BASE } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -53,11 +53,7 @@ export default function SeriesDetail() {
     } catch {}
   };
 
-  const coverUrl = series?.cover
-    ? series.cover.startsWith("/uploads")
-      ? `${API_BASE.replace("/api", "")}${series.cover}`
-      : series.cover
-    : null;
+  const coverUrl = getImageUrl(series?.cover);
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
