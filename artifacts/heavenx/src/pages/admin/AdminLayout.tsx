@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import {
   LayoutDashboard, BookOpen, Upload, Users, MessageSquare,
-  Share2, Bell, Settings, Image, BarChart3, Menu, X, ChevronRight, LogOut
+  Share2, Bell, Settings, Image, BarChart3, Menu, X, ChevronRight, LogOut, ArrowLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -45,6 +45,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="text-[10px] text-gray-400 font-medium">Admin Panel</div>
           </div>
         </div>
+        <Link href="/">
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 cursor-pointer transition-all">
+            <ArrowLeft size={13} />
+            بازگشت به سایت
+          </div>
+        </Link>
       </div>
 
       {/* Nav */}
@@ -116,7 +122,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <button onClick={() => setSidebarOpen(true)} className="text-gray-600 hover:text-gray-900">
             <Menu size={20} />
           </button>
-          <span className="font-bold text-gray-900">HEAVEN<span className="text-indigo-600">x</span> Admin</span>
+          <span className="font-bold text-gray-900 flex-1">HEAVEN<span className="text-indigo-600">x</span> Admin</span>
+          <Link href="/">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 cursor-pointer transition-all">
+              <ArrowLeft size={13} />
+              بازگشت
+            </div>
+          </Link>
         </div>
 
         <main className="flex-1 overflow-y-auto">
