@@ -46,10 +46,24 @@ export default function Navbar() {
                 className="h-10 w-10 object-contain"
                 style={{ filter: "drop-shadow(0 0 6px rgba(100,160,255,0.35))" }}
               />
-              <div>
-                <span className="font-black text-lg tracking-tight" style={{ color: "#f0f0f0" }}>HEAVEN</span>
-                <span className="font-black text-lg tracking-tight" style={{ color: "#ffffff" }}>x</span>
-              </div>
+              <span
+                dir="rtl"
+                style={{
+                  fontFamily: "'Noto Nastaliq Urdu', serif",
+                  fontWeight: 700,
+                  fontSize: "1.15rem",
+                  color: "#ffffff",
+                  background: "linear-gradient(135deg, rgba(0,136,204,0.35) 0%, rgba(0,80,180,0.25) 100%)",
+                  border: "1px solid rgba(0,136,204,0.45)",
+                  borderRadius: "10px",
+                  padding: "2px 10px 4px",
+                  boxShadow: "0 0 12px rgba(0,136,204,0.5), 0 0 24px rgba(0,100,200,0.25), inset 0 0 8px rgba(0,136,204,0.1)",
+                  textShadow: "0 0 10px rgba(0,180,255,0.8), 0 0 20px rgba(0,140,220,0.5)",
+                  lineHeight: "1.6",
+                }}
+              >
+                بهشت منهوا
+              </span>
             </div>
           </Link>
 
