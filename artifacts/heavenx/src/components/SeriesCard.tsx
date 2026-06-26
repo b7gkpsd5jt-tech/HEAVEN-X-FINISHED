@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Eye, BookOpen } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
-import { API_BASE } from "@/lib/api";
+import { getImageUrl } from "@/lib/api";
 
 interface Series {
   id: string;
@@ -20,16 +20,12 @@ interface Props {
 
 export default function SeriesCard({ series }: Props) {
   const { t } = useLang();
-  const coverUrl = series.cover
-    ? series.cover.startsWith("/uploads")
-      ? `${API_BASE.replace("/api", "")}${series.cover}`
-      : series.cover
-    : null;
+  const coverUrl = getImageUrl(series.cover);
 
   const statusColors: Record<string, string> = {
     ONGOING: "bg-green-100 text-green-700",
     COMPLETED: "bg-blue-100 text-blue-700",
-    HIATUS: "bg-yellow-100 text-yellow-700",
+    HIATUS: "bg-amber-100 text-amber-700",
     DROPPED: "bg-red-100 text-red-700",
   };
   const statusLabel: Record<string, string> = {
@@ -49,9 +45,12 @@ export default function SeriesCard({ series }: Props) {
               alt={series.title}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-100 to-violet-100">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-violet-100">
               <BookOpen size={36} className="text-indigo-300" />
             </div>
           )}

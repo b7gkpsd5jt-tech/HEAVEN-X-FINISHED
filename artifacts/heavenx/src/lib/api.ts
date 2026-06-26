@@ -40,3 +40,19 @@ export async function apiUpload<T = unknown>(
 
   return res.json();
 }
+
+/**
+ * Convert a stored file path like /uploads/cover.jpg → /api/uploads/cover.jpg
+ * so that the Replit proxy correctly routes the request to the API server.
+ */
+export function getImageUrl(filePath: string | null | undefined): string | null {
+  if (!filePath) return null;
+  if (filePath.startsWith("http://") || filePath.startsWith("https://")) return filePath;
+  if (filePath.startsWith("/uploads/")) {
+    return `${BASE}/api/uploads/${filePath.slice("/uploads/".length)}`;
+  }
+  if (filePath.startsWith("/api/uploads/")) {
+    return `${BASE}${filePath}`;
+  }
+  return filePath;
+}

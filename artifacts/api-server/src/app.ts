@@ -39,7 +39,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads";
-app.use("/uploads", express.static(path.resolve(UPLOAD_DIR)));
+const uploadPath = path.resolve(UPLOAD_DIR);
+app.use("/uploads", express.static(uploadPath));
+app.use("/api/uploads", express.static(uploadPath));
 
 app.use("/api", router);
 

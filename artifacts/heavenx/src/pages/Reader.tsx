@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams, Link } from "wouter";
-import { apiFetch, API_BASE } from "@/lib/api";
+import { useParams, Link, Redirect } from "wouter";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Settings, Moon, Sun, ZoomIn, ZoomOut,
-  List, X, Star, MessageSquare, Send, Eye, RotateCcw, ChevronDown
+  List, X, Star, MessageSquare, Send, RotateCcw, Contrast
 } from "lucide-react";
 
 interface Page { id: string; pageNumber: number; filePath: string; fileName: string; order: number }
@@ -23,16 +23,17 @@ interface ReaderSettings {
   zoom: number;
   brightness: number;
   nightMode: boolean;
+  invertColors: boolean;
   readMode: "vertical" | "horizontal";
 }
 
 function loadSettings(): ReaderSettings {
   try {
     return JSON.parse(localStorage.getItem("hx_reader_settings") || "null") || {
-      zoom: 100, brightness: 100, nightMode: false, readMode: "vertical"
+      zoom: 100, brightness: 100, nightMode: false, invertColors: false, readMode: "vertical"
     };
   } catch {
-    return { zoom: 100, brightness: 100, nightMode: false, readMode: "vertical" };
+    return { zoom: 100, brightness: 100, nightMode: false, invertColors: false, readMode: "vertical" };
   }
 }
 
@@ -43,7 +44,7 @@ function saveSettings(s: ReaderSettings) {
 export default function Reader() {
   const { id } = useParams();
   const { t } = useLang();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<ReaderSettings>(loadSettings);
@@ -77,13 +78,11 @@ export default function Reader() {
   useEffect(() => {
     if (!chapter) return;
     apiFetch<Comment[]>(`/comments/chapter/${chapter.id}`).then(setComments).catch(() => {});
-    // Fetch all chapters for the series
     apiFetch<{ id: string; number: number; title?: string }[]>(`/chapters/series/${chapter.series.id}`)
       .then(setAllChapters)
       .catch(() => {});
   }, [chapter]);
 
-  // Save reading progress when reaching last pages
   useEffect(() => {
     if (!user || !chapter || progressSavedRef.current) return;
     if (currentPage >= chapter.pages.length * 0.8) {
@@ -95,7 +94,6 @@ export default function Reader() {
     }
   }, [currentPage, chapter, user]);
 
-  // Header hide on scroll
   useEffect(() => {
     const onScroll = () => {
       const current = window.scrollY;
@@ -142,25 +140,34 @@ export default function Reader() {
     } catch {}
   };
 
-  const getPageUrl = (page: Page) => {
-    if (page.filePath.startsWith("/uploads")) {
-      return `${API_BASE.replace("/api", "")}${page.filePath}`;
-    }
-    return page.filePath;
-  };
+  // Redirect unauthenticated users
+  if (!authLoading && !user) {
+    return <Redirect to="/login" />;
+  }
 
-  if (loading) return (
-    <div className={`min-h-screen flex items-center justify-center ${settings.nightMode ? "bg-gray-950" : "bg-gray-100"}`}>
-      <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
+  if (loading || authLoading) return (
+    <div className={`min-h-screen flex items-center justify-center ${settings.nightMode ? "bg-gray-950" : "bg-gray-50"}`}>
+      <div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" />
     </div>
   );
 
   if (!chapter) return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500">Chapter not found</div>
+    <div className="min-h-screen bg-white flex items-center justify-center text-gray-500">
+      Chapter not found
+    </div>
   );
 
-  const bgColor = settings.nightMode ? "#0f0f0f" : "#f9f9f9";
-  const filterStyle = `brightness(${settings.brightness / 100}) ${settings.nightMode ? "sepia(0.4) hue-rotate(180deg)" : ""}`;
+  const bgColor = settings.nightMode ? "#0a0a0a" : "#f8f8f8";
+
+  // Build CSS filter: brightness + invert colors (no quality loss, CSS-only)
+  const buildFilter = () => {
+    const parts: string[] = [];
+    if (settings.brightness !== 100) parts.push(`brightness(${settings.brightness / 100})`);
+    if (settings.nightMode) parts.push("sepia(0.3) hue-rotate(180deg)");
+    if (settings.invertColors) parts.push("invert(1)");
+    return parts.join(" ") || "none";
+  };
+  const filterStyle = buildFilter();
 
   return (
     <div className="min-h-screen select-none" style={{ background: bgColor }}>
@@ -171,11 +178,11 @@ export default function Reader() {
             initial={{ y: -60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -60, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm"
+            className="fixed top-0 left-0 right-0 z-40 bg-white/96 backdrop-blur-md border-b border-gray-100 shadow-sm"
           >
             <div className="max-w-3xl mx-auto px-3 h-14 flex items-center justify-between gap-2">
               <Link href={`/series/${chapter.series.id}`}>
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors truncate max-w-[160px]">
+                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors truncate max-w-[160px]">
                   <ChevronLeft size={16} />
                   <span className="truncate">{chapter.series.title}</span>
                 </div>
@@ -185,11 +192,17 @@ export default function Reader() {
                 {t("chapter")} {chapter.number}
               </div>
 
-              <div className="flex items-center gap-1">
-                <button onClick={() => setShowChapterList(!showChapterList)} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={() => setShowChapterList(!showChapterList)}
+                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                >
                   <List size={17} />
                 </button>
-                <button onClick={() => setShowComments(!showComments)} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 relative">
+                <button
+                  onClick={() => setShowComments(!showComments)}
+                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors relative"
+                >
                   <MessageSquare size={17} />
                   {comments.length > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
@@ -197,7 +210,10 @@ export default function Reader() {
                     </span>
                   )}
                 </button>
-                <button onClick={() => setShowSettings(!showSettings)} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                >
                   <Settings size={17} />
                 </button>
               </div>
@@ -210,14 +226,16 @@ export default function Reader() {
       <AnimatePresence>
         {showSettings && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
             className="fixed top-14 right-4 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 w-72"
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-gray-900">{t("settings")}</h3>
-              <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+              <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={16} />
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -235,11 +253,25 @@ export default function Reader() {
                 </button>
               </div>
 
+              {/* Classic Invert Colors */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Contrast size={14} />
+                  Invert Colors
+                </div>
+                <button
+                  onClick={() => updateSettings({ invertColors: !settings.invertColors })}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${settings.invertColors ? "bg-indigo-600" : "bg-gray-200"}`}
+                >
+                  <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.invertColors ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+
               {/* Brightness */}
               <div>
                 <div className="flex justify-between text-sm text-gray-700 mb-1.5">
                   <span>{t("brightness")}</span>
-                  <span className="font-medium">{settings.brightness}%</span>
+                  <span className="font-medium text-gray-500">{settings.brightness}%</span>
                 </div>
                 <input
                   type="range" min="30" max="150" value={settings.brightness}
@@ -252,10 +284,13 @@ export default function Reader() {
               <div>
                 <div className="flex justify-between text-sm text-gray-700 mb-1.5">
                   <span>{t("zoom")}</span>
-                  <span className="font-medium">{settings.zoom}%</span>
+                  <span className="font-medium text-gray-500">{settings.zoom}%</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => updateSettings({ zoom: Math.max(50, settings.zoom - 10) })} className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">
+                  <button
+                    onClick={() => updateSettings({ zoom: Math.max(50, settings.zoom - 10) })}
+                    className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  >
                     <ZoomOut size={14} />
                   </button>
                   <input
@@ -263,7 +298,10 @@ export default function Reader() {
                     onChange={(e) => updateSettings({ zoom: Number(e.target.value) })}
                     className="flex-1 accent-indigo-600"
                   />
-                  <button onClick={() => updateSettings({ zoom: Math.min(200, settings.zoom + 10) })} className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">
+                  <button
+                    onClick={() => updateSettings({ zoom: Math.min(200, settings.zoom + 10) })}
+                    className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  >
                     <ZoomIn size={14} />
                   </button>
                 </div>
@@ -277,7 +315,7 @@ export default function Reader() {
                     <button
                       key={m}
                       onClick={() => updateSettings({ readMode: m })}
-                      className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${settings.readMode === m ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600"}`}
+                      className={`flex-1 py-2 text-xs font-medium rounded-xl transition-all ${settings.readMode === m ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
                     >
                       {m === "vertical" ? "⬇ Vertical" : "➡ Horizontal"}
                     </button>
@@ -287,8 +325,11 @@ export default function Reader() {
 
               {/* Reset */}
               <button
-                onClick={() => { const def = { zoom: 100, brightness: 100, nightMode: false, readMode: "vertical" as const }; updateSettings(def); }}
-                className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 rounded-lg"
+                onClick={() => {
+                  const def: ReaderSettings = { zoom: 100, brightness: 100, nightMode: false, invertColors: false, readMode: "vertical" };
+                  updateSettings(def);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
               >
                 <RotateCcw size={12} /> Reset
               </button>
@@ -308,7 +349,9 @@ export default function Reader() {
           >
             <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center">
               <h3 className="font-semibold text-gray-900 text-sm">{t("chapterList")}</h3>
-              <button onClick={() => setShowChapterList(false)} className="text-gray-400"><X size={14} /></button>
+              <button onClick={() => setShowChapterList(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={14} />
+              </button>
             </div>
             <div className="divide-y divide-gray-50">
               {[...allChapters].reverse().map((ch) => (
@@ -329,14 +372,18 @@ export default function Reader() {
       {/* Pages */}
       <div className="pt-14 pb-20">
         {settings.readMode === "vertical" ? (
-          <div className="flex flex-col items-center gap-1 px-2">
+          <div className="flex flex-col items-center gap-0.5">
             {chapter.pages.map((page, idx) => (
               <img
                 key={page.id}
-                src={getPageUrl(page)}
-                alt={`Page ${page.pageNumber}`}
+                src={getImageUrl(page.filePath) || ""}
+                alt=""
                 loading="lazy"
                 onLoad={() => { if (idx + 1 > currentPage) setCurrentPage(idx + 1); }}
+                onError={(e) => {
+                  const el = e.target as HTMLImageElement;
+                  el.style.display = "none";
+                }}
                 style={{
                   width: `${settings.zoom}%`,
                   maxWidth: "900px",
@@ -344,30 +391,46 @@ export default function Reader() {
                   display: "block",
                   margin: "0 auto",
                 }}
-                className="shadow-md"
               />
             ))}
           </div>
         ) : (
           <div className="max-w-3xl mx-auto px-4 h-[calc(100vh-120px)] flex flex-col">
             {chapter.pages[currentHPage] && (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center overflow-hidden">
                 <img
-                  src={getPageUrl(chapter.pages[currentHPage])}
-                  alt={`Page ${currentHPage + 1}`}
-                  style={{ maxHeight: "100%", maxWidth: "100%", filter: filterStyle, width: `${settings.zoom}%` }}
+                  src={getImageUrl(chapter.pages[currentHPage].filePath) || ""}
+                  alt=""
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    filter: filterStyle,
+                    width: `${settings.zoom}%`,
+                  }}
                   className="object-contain"
+                  onError={(e) => {
+                    const el = e.target as HTMLImageElement;
+                    el.style.display = "none";
+                  }}
                 />
               </div>
             )}
             <div className="flex items-center justify-center gap-6 py-4">
-              <button disabled={currentHPage === 0} onClick={() => setCurrentHPage(p => p - 1)} className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50">
+              <button
+                disabled={currentHPage === 0}
+                onClick={() => setCurrentHPage(p => p - 1)}
+                className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              >
                 <ChevronLeft size={18} />
               </button>
-              <span className="text-sm text-gray-600 font-medium">
-                {t("page")} {currentHPage + 1} {t("of")} {chapter.pages.length}
+              <span className="text-sm text-gray-500 font-medium tabular-nums">
+                {currentHPage + 1} / {chapter.pages.length}
               </span>
-              <button disabled={currentHPage >= chapter.pages.length - 1} onClick={() => setCurrentHPage(p => p + 1)} className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50">
+              <button
+                disabled={currentHPage >= chapter.pages.length - 1}
+                onClick={() => setCurrentHPage(p => p + 1)}
+                className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+              >
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -376,7 +439,7 @@ export default function Reader() {
       </div>
 
       {/* Bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/96 backdrop-blur-md border-t border-gray-100 shadow-lg">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           {chapter.prevChapter ? (
             <Link href={`/reader/${chapter.prevChapter.id}`}>
@@ -386,9 +449,9 @@ export default function Reader() {
             </Link>
           ) : <div />}
 
-          <div className="text-xs text-gray-500 text-center">
+          <div className="text-xs text-gray-400 text-center tabular-nums">
             {settings.readMode === "vertical" ? (
-              <>p.{currentPage} / {chapter.pages.length}</>
+              <>{currentPage} / {chapter.pages.length}</>
             ) : (
               <>Ch.{chapter.number}</>
             )}
@@ -402,7 +465,9 @@ export default function Reader() {
             </Link>
           ) : (
             <Link href={`/series/${chapter.series.id}`}>
-              <button className="px-4 py-2 text-sm font-medium bg-green-100 text-green-700 rounded-xl">✓ Done</button>
+              <button className="px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors">
+                ✓ Done
+              </button>
             </Link>
           )}
         </div>
@@ -420,12 +485,14 @@ export default function Reader() {
           >
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <h2 className="font-bold text-gray-900">{t("comments")}</h2>
-              <button onClick={() => setShowComments(false)} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
+              <button onClick={() => setShowComments(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={18} />
+              </button>
             </div>
 
             {/* Rating */}
             <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-              <p className="text-xs font-medium text-gray-600 mb-2">{t("rating")}</p>
+              <p className="text-xs font-medium text-gray-500 mb-2">{t("rating")}</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button key={s} onClick={() => submitRating(s)} disabled={!user}>
@@ -464,7 +531,7 @@ export default function Reader() {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder={t("addComment")}
-                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-gray-50"
                     onKeyDown={(e) => e.key === "Enter" && submitComment()}
                   />
                   <button onClick={submitComment} className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">

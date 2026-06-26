@@ -1,0 +1,89 @@
+Layout und Farbschema
+
+* Das aktuelle lila/schwarze Design soll vollständig entfernt werden.
+* Die gesamte Plattform soll ein modernes, helles und professionelles Design erhalten.
+* Hauptfarbe: Weiß.
+* Akzentfarben sollen dezent und modern sein.
+* Alle Seiten (Login, Dashboard, Manhwa, Chapter, Reader und Admin-Panel) müssen das gleiche Design verwenden.
+
+⸻
+
+2. Fehler beim Laden von Bildern beheben
+
+* Alle Fehler beim Anzeigen oder Hochladen von Bildern müssen vollständig behoben werden.
+* Cover-Bilder dürfen keine Fehlermeldung anzeigen.
+* Banner-Bilder dürfen keine Fehlermeldung anzeigen.
+* Chapter-Bilder dürfen keine Fehlermeldung anzeigen.
+* Profilbilder dürfen keine Fehlermeldung anzeigen.
+* Es dürfen keine defekten Bilder oder Platzhalter angezeigt werden.
+* Unterstützte Formate: JPG, JPEG, PNG und WEBP.
+* Alle Bilder müssen automatisch optimiert und korrekt angezeigt werden.
+
+⸻
+
+3. Login-Seite als Startseite
+
+* Beim Aufruf der Webseite soll immer zuerst die Login-Seite angezeigt werden.
+* Nicht angemeldete Besucher dürfen keine Inhalte der Plattform sehen.
+* Erst nach erfolgreicher Anmeldung erhält der Benutzer Zugriff.
+
+Die Login-Seite enthält:
+
+* Benutzername
+* Passwort
+* Login-Button
+* Telegram-Button
+* Weitere aktivierte Social-Media-Buttons
+* Sprachauswahl (Deutsch, Englisch, Persisch)
+
+⸻
+
+4. Willkommens-Popup
+
+* Das Willkommens-Popup erscheint automatisch beim ersten Aufruf der Webseite.
+* Nach dem Klick auf „متوجه شدم“ wird das Popup geschlossen.
+* Anschließend bleibt der Benutzer auf der Login-Seite und kann sich anmelden.
+* Das Popup darf die Anmeldung nicht verhindern und muss auf allen Geräten fehlerfrei funktionieren.
+
+⸻
+
+5. Keine Seitenbeschreibung im Reader
+
+* Im Reader dürfen keine automatischen Beschriftungen wie:
+    * Page 1
+    * Page 2
+    * Page 3
+    * Image 1
+    * Image 2
+    * oder ähnliche Texte
+        angezeigt werden.
+* Es sollen ausschließlich die hochgeladenen Chapter-Bilder sichtbar sein.
+* Der Reader soll sauber, modern und ohne störende Beschriftungen dargestellt werden.
+
+⸻
+
+6. Classic Invert Colors
+
+Für jedes Chapter muss eine Classic Invert Colors-Funktion verfügbar sein.
+
+Funktionen:
+
+* Farben der Chapter-Seiten vollständig invertieren (Negativ-Effekt).
+* Ein-/Ausschalten über einen Schalter im Reader.
+* Die Einstellung wird pro Benutzer gespeichert.
+* Funktioniert auf Smartphone, Tablet und Desktop.
+* Keine Qualitätsverluste oder Darstellungsfehler der Bilder.
+
+⸻
+
+7. Qualitätsanforderung
+
+Die Entwicklung gilt erst als abgeschlossen, wenn:
+
+* ✅ Das lila/schwarze Layout vollständig entfernt wurde.
+* ✅ Das neue helle, moderne Design auf allen Seiten verwendet wird.
+* ✅ Alle Bildfehler behoben wurden.
+* ✅ Die Login-Seite immer zuerst angezeigt wird.
+* ✅ Das Popup fehlerfrei funktioniert.
+* ✅ Im Reader keine automatischen „Page 1“, „Page 2“ oder ähnlichen Beschriftungen erscheinen.
+* ✅ Die Classic Invert Colors-Funktion vollständig und fehlerfrei auf allen Geräten funktioniert.
