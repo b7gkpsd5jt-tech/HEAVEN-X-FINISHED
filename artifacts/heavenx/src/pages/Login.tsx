@@ -134,12 +134,20 @@ export default function Login() {
           className="rounded-2xl p-7"
           style={{ background: "#0f0f0f", border: "1px solid #1e1e1e" }}
         >
-          <h2 className="text-lg font-bold mb-5 text-center" style={{ color: "#f0f0f0" }}>{t("login")}</h2>
+          <h2
+            className="mb-5 text-center"
+            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", color: "#ffffff", textShadow: "0 1px 10px rgba(255,255,255,0.25)" }}
+          >
+            {t("login")}
+          </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
-              <label className="text-sm font-medium block mb-1.5" style={{ color: "#888" }}>
+              <label
+                className="block mb-1.5"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.06em", color: "#aaaaaa", textShadow: "0 1px 6px rgba(255,255,255,0.15)" }}
+              >
                 {t("username")}
               </label>
               <div className="relative">
@@ -159,7 +167,10 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="text-sm font-medium block mb-1.5" style={{ color: "#888" }}>
+              <label
+                className="block mb-1.5"
+                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.06em", color: "#aaaaaa", textShadow: "0 1px 6px rgba(255,255,255,0.15)" }}
+              >
                 {t("password")}
               </label>
               <div className="relative">
@@ -199,8 +210,13 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 rounded-xl disabled:opacity-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
               style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                fontSize: "1rem",
+                letterSpacing: "0.06em",
+                textShadow: "0 1px 8px rgba(255,255,255,0.3)",
                 background: "rgba(255,255,255,0.12)",
                 color: "#ffffff",
                 border: "1px solid rgba(255,255,255,0.25)",
