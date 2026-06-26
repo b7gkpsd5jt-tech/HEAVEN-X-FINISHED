@@ -100,7 +100,7 @@ export default function Login() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-3">
+          <div className="flex justify-center mb-4">
             <img
               src="/logo.png"
               alt="HEAVENx Logo"
@@ -108,10 +108,19 @@ export default function Login() {
               style={{ filter: "drop-shadow(0 0 16px rgba(100,160,255,0.4))" }}
             />
           </div>
-          <h1 className="text-3xl font-black tracking-tight" style={{ color: "#f0f0f0" }}>
-            HEAVEN<span style={{ color: "#ffffff" }}>x</span>
+          <h1
+            dir="rtl"
+            style={{
+              fontFamily: "'Noto Nastaliq Urdu', serif",
+              fontSize: "2.2rem",
+              lineHeight: "1.5",
+              color: "#f0f0f0",
+              fontWeight: 700,
+              letterSpacing: "0.01em",
+            }}
+          >
+            بهشت منهوا
           </h1>
-          <p className="text-sm mt-1 font-medium" style={{ color: "#555" }}>بهشت منهوا</p>
         </div>
 
         {/* Card */}
