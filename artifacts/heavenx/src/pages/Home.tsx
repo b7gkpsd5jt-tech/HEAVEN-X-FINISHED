@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
 import SeriesCard from "@/components/SeriesCard";
 import { motion } from "framer-motion";
@@ -37,51 +37,63 @@ export default function Home() {
       apiFetch<Series[]>("/series/latest"),
       apiFetch<Settings>("/settings"),
     ])
-      .then(([t, l, s]) => {
-        setTrending(t);
-        setLatest(l);
-        setSettings(s);
-      })
+      .then(([t, l, s]) => { setTrending(t); setLatest(l); setSettings(s); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  const bannerUrl = getImageUrl(settings.bannerUrl);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Banner */}
-      <div className="relative h-64 md:h-96 overflow-hidden bg-gradient-to-br from-indigo-900 via-violet-900 to-purple-900">
-        {settings.bannerUrl && (
-          <img
-            src={settings.bannerUrl}
-            alt="Banner"
-            className="absolute inset-0 w-full h-full object-cover opacity-40"
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+    <div className="min-h-screen" style={{ background: "#0a0a0a" }}>
+      {/* ── Hero Banner ── */}
+      <div className="relative w-full overflow-hidden" style={{ height: "clamp(200px, 40vh, 480px)" }}>
+        {/* Background layer */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: bannerUrl
+              ? `url(${bannerUrl}) center/cover no-repeat`
+              : "linear-gradient(135deg, #111 0%, #1a1a1a 50%, #0a0a0a 100%)",
+          }}
+        />
+
+        {/* Dark overlay for readability (50% opacity) */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.65) 100%)" }}
+        />
+
+        {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-3">
-              HEAVEN<span className="text-indigo-400">x</span>
+            <h1 className="font-black text-white tracking-tight mb-2"
+              style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}>
+              HEAVEN<span style={{ color: "#ffffff", textShadow: "0 0 30px rgba(255,255,255,0.6)" }}>x</span>
             </h1>
-            {settings.bannerOverlayText && (
-              <p className="text-white/80 text-lg md:text-xl max-w-lg">{settings.bannerOverlayText}</p>
-            )}
-            {!settings.bannerOverlayText && (
-              <p className="text-white/70 text-sm md:text-base">بهشت منهوا — بهترین مانهواها به زبان فارسی</p>
-            )}
+            <p className="text-white/75 mb-1" style={{ fontSize: "clamp(0.8rem, 2vw, 1.1rem)" }}>
+              {settings.bannerOverlayText || "بهشت منهوا — بهترین مانهواها به زبان فارسی"}
+            </p>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-5"
+            className="mt-4"
           >
             <Link href="/library">
-              <button className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all hover:-translate-y-0.5">
+              <button
+                className="px-6 py-2.5 font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5"
+                style={{
+                  background: "#ffffff",
+                  color: "#000000",
+                  boxShadow: "0 4px 20px rgba(255,255,255,0.2)",
+                }}
+              >
                 {t("allSeries")} <ChevronRight className="inline w-4 h-4 ml-1" />
               </button>
             </Link>
@@ -91,7 +103,7 @@ export default function Home() {
 
       {/* Announcement */}
       {settings.announcement && (
-        <div className="bg-indigo-50 border-b border-indigo-100 px-4 py-2 text-center text-sm text-indigo-700">
+        <div className="px-4 py-2 text-center text-sm text-white/70 border-b" style={{ background: "#111", borderColor: "#222" }}>
           {settings.announcement}
         </div>
       )}
@@ -101,13 +113,13 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                <TrendingUp size={16} className="text-orange-600" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+                <TrendingUp size={16} style={{ color: "#aaa" }} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{t("trending")}</h2>
+              <h2 className="text-xl font-bold" style={{ color: "#f0f0f0" }}>{t("trending")}</h2>
             </div>
             <Link href="/library?sort=popular">
-              <span className="text-sm text-indigo-600 hover:text-indigo-700 font-medium cursor-pointer flex items-center gap-1">
+              <span className="text-sm font-medium cursor-pointer flex items-center gap-1" style={{ color: "#aaa" }}>
                 {t("allSeries")} <ChevronRight size={14} />
               </span>
             </Link>
@@ -116,26 +128,20 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="rounded-xl bg-gray-200 aspect-[3/4]" />
-                  <div className="mt-2 h-3 bg-gray-200 rounded w-3/4" />
-                  <div className="mt-1 h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="rounded-xl aspect-[3/4]" style={{ background: "#1a1a1a" }} />
+                  <div className="mt-2 h-3 rounded w-3/4" style={{ background: "#1a1a1a" }} />
+                  <div className="mt-1 h-3 rounded w-1/2" style={{ background: "#1a1a1a" }} />
                 </div>
               ))}
             </div>
           ) : (
             <motion.div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
             >
-              {trending.map((s) => (
-                <SeriesCard key={s.id} series={s} />
-              ))}
+              {trending.map((s) => <SeriesCard key={s.id} series={s} />)}
               {trending.length === 0 && (
-                <div className="col-span-full text-center py-16 text-gray-400">
-                  {t("noResults")}
-                </div>
+                <div className="col-span-full text-center py-16" style={{ color: "#555" }}>{t("noResults")}</div>
               )}
             </motion.div>
           )}
@@ -145,13 +151,13 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Clock size={16} className="text-blue-600" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+                <Clock size={16} style={{ color: "#aaa" }} />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{t("latest")}</h2>
+              <h2 className="text-xl font-bold" style={{ color: "#f0f0f0" }}>{t("latest")}</h2>
             </div>
             <Link href="/library?sort=newest">
-              <span className="text-sm text-indigo-600 hover:text-indigo-700 font-medium cursor-pointer flex items-center gap-1">
+              <span className="text-sm font-medium cursor-pointer flex items-center gap-1" style={{ color: "#aaa" }}>
                 {t("allSeries")} <ChevronRight size={14} />
               </span>
             </Link>
@@ -160,26 +166,20 @@ export default function Home() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="rounded-xl bg-gray-200 aspect-[3/4]" />
-                  <div className="mt-2 h-3 bg-gray-200 rounded w-3/4" />
-                  <div className="mt-1 h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="rounded-xl aspect-[3/4]" style={{ background: "#1a1a1a" }} />
+                  <div className="mt-2 h-3 rounded w-3/4" style={{ background: "#1a1a1a" }} />
+                  <div className="mt-1 h-3 rounded w-1/2" style={{ background: "#1a1a1a" }} />
                 </div>
               ))}
             </div>
           ) : (
             <motion.div
               className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
             >
-              {latest.map((s) => (
-                <SeriesCard key={s.id} series={s} />
-              ))}
+              {latest.map((s) => <SeriesCard key={s.id} series={s} />)}
               {latest.length === 0 && (
-                <div className="col-span-full text-center py-16 text-gray-400">
-                  {t("noResults")}
-                </div>
+                <div className="col-span-full text-center py-16" style={{ color: "#555" }}>{t("noResults")}</div>
               )}
             </motion.div>
           )}

@@ -31,87 +31,133 @@ export default function SystemSettings() {
     } finally { setSaving(false); }
   };
 
-  if (loading) return <div className="p-6 flex justify-center"><div className="animate-spin w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full" /></div>;
+  if (loading) return (
+    <div className="p-6 flex justify-center">
+      <div className="animate-spin w-6 h-6 border-2 border-t-transparent rounded-full" style={{ borderColor: "#fff #fff #fff transparent" }} />
+    </div>
+  );
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-          <Settings size={18} className="text-gray-600" />
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+          <Settings size={18} style={{ color: "#aaa" }} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">{t("systemSettings")}</h1>
+        <h1 className="text-2xl font-bold" style={{ color: "#f0f0f0" }}>{t("systemSettings")}</h1>
       </div>
 
       <form onSubmit={handleSave} className="space-y-5">
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-          <h2 className="font-semibold text-gray-900 mb-4">General</h2>
+        {/* General */}
+        <div className="rounded-2xl p-5" style={{ background: "#111", border: "1px solid #222" }}>
+          <h2 className="font-semibold mb-4" style={{ color: "#f0f0f0" }}>Allgemein</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-medium text-gray-600 block mb-1">{t("siteName")}</label>
-              <input value={settings.siteName || ""} onChange={e => setSettings(s => ({ ...s, siteName: e.target.value }))} className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+              <label className="text-xs font-medium block mb-1" style={{ color: "#888" }}>{t("siteName")}</label>
+              <input
+                value={settings.siteName || ""}
+                onChange={e => setSettings(s => ({ ...s, siteName: e.target.value }))}
+                className="w-full px-3 py-2.5 text-sm rounded-xl focus:outline-none"
+                style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
+              />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-600 block mb-1">Primary Color</label>
+              <label className="text-xs font-medium block mb-1" style={{ color: "#888" }}>Primärfarbe</label>
               <div className="flex gap-3 items-center">
-                <input type="color" value={settings.primaryColor || "#6366f1"} onChange={e => setSettings(s => ({ ...s, primaryColor: e.target.value }))} className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer" />
-                <span className="text-sm text-gray-600">{settings.primaryColor || "#6366f1"}</span>
+                <input
+                  type="color"
+                  value={settings.primaryColor || "#ffffff"}
+                  onChange={e => setSettings(s => ({ ...s, primaryColor: e.target.value }))}
+                  className="w-10 h-10 rounded-lg cursor-pointer"
+                  style={{ border: "1px solid #2a2a2a", background: "#1a1a1a" }}
+                />
+                <span className="text-sm" style={{ color: "#888" }}>{settings.primaryColor || "#ffffff"}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-          <h2 className="font-semibold text-gray-900 mb-4">{t("maintenance")}</h2>
+        {/* Maintenance */}
+        <div className="rounded-2xl p-5" style={{ background: "#111", border: "1px solid #222" }}>
+          <h2 className="font-semibold mb-4" style={{ color: "#f0f0f0" }}>{t("maintenance")}</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-700">{t("maintenance")}</p>
-                <p className="text-xs text-gray-400">Show maintenance page to all users</p>
+                <p className="text-sm font-medium" style={{ color: "#ccc" }}>{t("maintenance")}</p>
+                <p className="text-xs" style={{ color: "#555" }}>Wartungsseite für alle Benutzer anzeigen</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSettings(s => ({ ...s, maintenanceMode: !s.maintenanceMode }))}
-                className={`relative w-11 h-6 rounded-full transition-colors ${settings.maintenanceMode ? "bg-orange-500" : "bg-gray-200"}`}
+                className="relative w-11 h-6 rounded-full transition-colors"
+                style={{ background: settings.maintenanceMode ? "#f59e0b" : "#2a2a2a" }}
               >
-                <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.maintenanceMode ? "translate-x-5" : "translate-x-0.5"}`} />
+                <div
+                  className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-transform"
+                  style={{
+                    background: "#fff",
+                    transform: settings.maintenanceMode ? "translateX(20px)" : "translateX(2px)",
+                  }}
+                />
               </button>
             </div>
+
             {settings.maintenanceMode && (
               <div>
-                <label className="text-xs font-medium text-gray-600 block mb-1">Maintenance Message</label>
+                <label className="text-xs font-medium block mb-1" style={{ color: "#888" }}>Wartungsnachricht</label>
                 <textarea
                   value={settings.maintenanceMessage || ""}
                   onChange={e => setSettings(s => ({ ...s, maintenanceMessage: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300"
-                  placeholder="Site is under maintenance. We'll be back soon!"
+                  className="w-full px-3 py-2 text-sm rounded-xl resize-none focus:outline-none"
+                  style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
+                  placeholder="Die Seite wird gewartet. Wir sind bald zurück!"
                 />
               </div>
             )}
+
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-700">Site Active</p>
-                <p className="text-xs text-gray-400">Disable to take site offline</p>
+                <p className="text-sm font-medium" style={{ color: "#ccc" }}>Seite aktiv</p>
+                <p className="text-xs" style={{ color: "#555" }}>Deaktivieren um die Seite offline zu nehmen</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSettings(s => ({ ...s, siteEnabled: !s.siteEnabled }))}
-                className={`relative w-11 h-6 rounded-full transition-colors ${settings.siteEnabled !== false ? "bg-green-500" : "bg-gray-200"}`}
+                className="relative w-11 h-6 rounded-full transition-colors"
+                style={{ background: settings.siteEnabled !== false ? "#22c55e" : "#2a2a2a" }}
               >
-                <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.siteEnabled !== false ? "translate-x-5" : "translate-x-0.5"}`} />
+                <div
+                  className="absolute top-0.5 w-5 h-5 rounded-full shadow transition-transform"
+                  style={{
+                    background: "#fff",
+                    transform: settings.siteEnabled !== false ? "translateX(20px)" : "translateX(2px)",
+                  }}
+                />
               </button>
             </div>
           </div>
         </div>
 
         {message && (
-          <div className={`flex items-center gap-2 p-3 rounded-xl text-sm ${message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+          <div
+            className="flex items-center gap-2 p-3 rounded-xl text-sm"
+            style={message.type === "success"
+              ? { background: "#0f2a0f", color: "#66cc66", border: "1px solid #1a3a1a" }
+              : { background: "#2a0f0f", color: "#ff6b6b", border: "1px solid #3a1515" }}
+          >
             {message.text}
-            <button type="button" onClick={() => setMessage(null)} className="ml-auto"><X size={14} /></button>
+            <button type="button" onClick={() => setMessage(null)} className="ml-auto" style={{ color: "inherit" }}>
+              <X size={14} />
+            </button>
           </div>
         )}
 
-        <button type="submit" disabled={saving} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl disabled:opacity-60 transition-all">
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all"
+          style={{ background: "#ffffff", color: "#000000" }}
+        >
           {saving ? t("loading") : t("save")}
         </button>
       </form>
