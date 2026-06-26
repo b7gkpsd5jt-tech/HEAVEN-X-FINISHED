@@ -25,14 +25,14 @@ const PLATFORM_ICONS: Record<string, string> = {
   tiktok: "🎵",
 };
 
-const PLATFORM_COLORS: Record<string, string> = {
-  telegram: "bg-sky-500 hover:bg-sky-600",
-  instagram: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
-  twitter: "bg-gray-900 hover:bg-gray-800",
-  youtube: "bg-red-600 hover:bg-red-700",
-  discord: "bg-indigo-500 hover:bg-indigo-600",
-  whatsapp: "bg-green-500 hover:bg-green-600",
-  tiktok: "bg-gray-900 hover:bg-gray-800",
+const PLATFORM_COLORS: Record<string, { bg: string; hover: string }> = {
+  telegram:  { bg: "#0088cc", hover: "#0077b5" },
+  instagram: { bg: "#c13584", hover: "#a02d6e" },
+  twitter:   { bg: "#1a1a1a", hover: "#2a2a2a" },
+  youtube:   { bg: "#cc0000", hover: "#aa0000" },
+  discord:   { bg: "#5865f2", hover: "#4752c4" },
+  whatsapp:  { bg: "#25d366", hover: "#1db954" },
+  tiktok:    { bg: "#1a1a1a", hover: "#2a2a2a" },
 };
 
 export default function Login() {
@@ -68,8 +68,10 @@ export default function Login() {
   const isRTL = (text: string) => /[\u0600-\u06FF]/.test(text);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center p-4 relative">
-      {/* Welcome popup shown on login page */}
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{ background: "#000000" }}
+    >
       <WelcomePopup />
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -79,17 +81,16 @@ export default function Login() {
       >
         {/* Language switcher */}
         <div className="flex justify-end mb-4">
-          <div className="flex items-center gap-1 bg-white rounded-xl border border-gray-200 p-1 shadow-sm">
-            <Globe size={13} className="text-gray-400 ml-1" />
+          <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "#111", border: "1px solid #222" }}>
+            <Globe size={13} style={{ color: "#555" }} className="ml-1" />
             {(["DE", "EN", "FA"] as Lang[]).map((l) => (
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
-                  lang === l
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "text-gray-500 hover:text-gray-800"
-                }`}
+                className="px-2.5 py-1 text-xs font-bold rounded-lg transition-all"
+                style={lang === l
+                  ? { background: "#ffffff", color: "#000000" }
+                  : { background: "transparent", color: "#666" }}
               >
                 {l}
               </button>
@@ -98,34 +99,43 @@ export default function Login() {
         </div>
 
         {/* Logo */}
-        <div className="text-center mb-6">
-          <div className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 items-center justify-center shadow-lg mb-3">
-            <span className="text-white font-black text-2xl tracking-tight">HX</span>
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-3">
+            <img
+              src="/logo.png"
+              alt="HEAVENx Logo"
+              className="h-28 w-28 object-contain"
+              style={{ filter: "drop-shadow(0 0 16px rgba(100,160,255,0.4))" }}
+            />
           </div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-            HEAVEN<span className="text-indigo-600">x</span>
+          <h1 className="text-3xl font-black tracking-tight" style={{ color: "#f0f0f0" }}>
+            HEAVEN<span style={{ color: "#ffffff" }}>x</span>
           </h1>
-          <p className="text-sm text-gray-400 mt-1 font-medium">بهشت منهوا</p>
+          <p className="text-sm mt-1 font-medium" style={{ color: "#555" }}>بهشت منهوا</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-7">
-          <h2 className="text-lg font-bold text-gray-900 mb-5 text-center">{t("login")}</h2>
+        <div
+          className="rounded-2xl p-7"
+          style={{ background: "#0f0f0f", border: "1px solid #1e1e1e" }}
+        >
+          <h2 className="text-lg font-bold mb-5 text-center" style={{ color: "#f0f0f0" }}>{t("login")}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
-              <label className="text-sm font-medium text-gray-600 block mb-1.5">
+              <label className="text-sm font-medium block mb-1.5" style={{ color: "#888" }}>
                 {t("username")}
               </label>
               <div className="relative">
-                <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-gray-50 transition-all"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
+                  style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
                   placeholder="username"
                   autoComplete="username"
                   autoFocus
@@ -135,23 +145,25 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="text-sm font-medium text-gray-600 block mb-1.5">
+              <label className="text-sm font-medium block mb-1.5" style={{ color: "#888" }}>
                 {t("password")}
               </label>
               <div className="relative">
-                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-9 pr-10 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-gray-50 transition-all"
+                  className="w-full pl-9 pr-10 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
+                  style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "#555" }}
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -161,7 +173,8 @@ export default function Login() {
             {/* Error */}
             {error && (
               <div
-                className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-700"
+                className="p-3 rounded-xl text-sm"
+                style={{ background: "#1a0808", border: "1px solid #2a1010", color: "#ff6b6b" }}
                 dir={isRTL(error) ? "rtl" : "ltr"}
               >
                 {error}
@@ -172,11 +185,12 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm rounded-xl transition-all shadow-sm hover:shadow-indigo-200 hover:shadow-md bg-foreground"
+              className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all"
+              style={{ background: "#ffffff", color: "#000000" }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                   {t("loading")}
                 </span>
               ) : (
@@ -187,29 +201,33 @@ export default function Login() {
 
           {/* Social links */}
           {socialLinks.length > 0 && (
-            <div className="mt-5 pt-5 border-t border-gray-100">
-              <p className="text-xs text-gray-400 text-center mb-3">{t("followUs") || "ما را دنبال کنید"}</p>
+            <div className="mt-5 pt-5" style={{ borderTop: "1px solid #1e1e1e" }}>
+              <p className="text-xs text-center mb-3" style={{ color: "#555" }}>
+                {t("followUs") || "ما را دنبال کنید"}
+              </p>
               <div className="flex flex-col gap-2">
-                {socialLinks.map((link) => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium text-white transition-all ${
-                      PLATFORM_COLORS[link.platform] || "bg-gray-700 hover:bg-gray-800"
-                    }`}
-                  >
-                    <span className="text-base">{PLATFORM_ICONS[link.platform] || "🔗"}</span>
-                    {link.label || link.platform}
-                  </a>
-                ))}
+                {socialLinks.map((link) => {
+                  const colors = PLATFORM_COLORS[link.platform] || { bg: "#1a1a1a", hover: "#2a2a2a" };
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium text-white transition-all"
+                      style={{ background: colors.bg }}
+                    >
+                      <span className="text-base">{PLATFORM_ICONS[link.platform] || "🔗"}</span>
+                      {link.label || link.platform}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs mt-4" style={{ color: "#333" }}>
           © {new Date().getFullYear()} HEAVENx — بهشت منهوا
         </p>
       </motion.div>
