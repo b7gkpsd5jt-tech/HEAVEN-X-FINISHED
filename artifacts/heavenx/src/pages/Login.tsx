@@ -238,8 +238,11 @@ export default function Login() {
           {/* Social links */}
           {socialLinks.length > 0 && (
             <div className="mt-5 pt-5" style={{ borderTop: "1px solid #1e1e1e" }}>
-              <p className="text-xs text-center mb-3" style={{ color: "#555" }}>
-                {t("followUs") || "ما را دنبال کنید"}
+              <p
+                className="text-center mb-3"
+                style={{ color: "#666", fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "0.78rem", letterSpacing: "0.04em" }}
+              >
+                مارو دنبال کن
               </p>
               <div className="flex flex-col gap-2">
                 {socialLinks.map((link) => {
