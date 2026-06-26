@@ -1,0 +1,274 @@
+# GLOBAL RULES
+
+* Alles muss exakt so gebaut werden wie beschrieben
+* Keine Features entfernen oder vereinfachen
+* Full Stack System (Frontend + Backend + Admin Panel)
+* Mobile + Tablet + Desktop vollständig unterstützt
+* Alle Uploads müssen stabil funktionieren
+
+---
+
+## 1. 🧭 NAVIGATION SYSTEM
+* Bereiche:
+    * Manhwa
+    * Chapter
+    * Upload
+
+👉 **MUST:**
+* Alle 3 Bereiche werden zu einem einzigen Menüpunkt kombiniert
+* Name überall: Chapter (NICHT Kapitel)
+
+---
+
+## 2. 📚 MANHWA SYSTEM
+### Create Manhwa
+**Fields:**
+* name
+* genre
+* description
+* cover image upload
+
+**Allowed formats:**
+* JPG / PNG / WEBP
+
+❗ **BUG FIX:**
+* Cover upload funktioniert aktuell NICHT → MUSS FIXED werden
+
+### Manage Manhwa
+* Edit:
+    * name
+    * genre
+    * description
+    * cover image
+* Delete button (trash icon) MUST WORK
+
+---
+
+## 3. CHAPTER UPLOAD SYSTEM
+### Step 1
+* Select Manhwa first
+
+### Step 2 Upload Options:
+**A) ZIP Upload**
+* upload ZIP file
+* auto extract images
+* auto sort images (01 → last)
+
+**CRITICAL BUG FIX:**
+No file received — check FormData field name is "file"
+Must support:
+* large files
+* progress bar
+* stable upload
+
+**B) Image Upload**
+* multi image upload
+* 1–20+ images
+* auto sorting by filename
+* optional drag & drop reorder
+
+### Reader Output
+* vertical scroll reader
+* correct image order guaranteed
+
+---
+
+## 4. UI DESIGN
+* REMOVE gold theme
+* REPLACE with:
+    * clean white modern UI
+    * minimal design
+    * professional layout
+
+---
+
+## 5. AUTH SYSTEM
+* NO public access
+* only approved users can login
+
+**Admin:**
+* create users
+* edit users
+* delete users
+* disable users
+
+---
+
+## 6. DEVICE LOCK SYSTEM
+**Rule:**
+* 1 account = 1 device
+
+**Flow:**
+* first login binds device
+* other devices blocked
+
+**Error Message (Persian):**
+> این اطلاعات قبلاً به نام شخص دیگری ثبت شده است، در صورت ادامه تلاش، دسترسی به این اطلاعات مسدود خواهد شد
+
+**Admin Controls:**
+* reset device
+* allow 2 devices
+* unlimited devices option
+
+---
+
+## 7. ACCESS CONTROL
+* only admin-approved users can access content
+* unauthorized users see login only
+
+---
+
+## 8. SOCIAL MEDIA SYSTEM
+**Login Page Buttons:**
+* Telegram (https://t.me/heavenxmanh)
+* YouTube
+* Instagram
+* Discord
+* Twitch
+
+**Admin:**
+* add/edit/remove buttons
+* auto icons
+* custom links
+* enable/disable
+
+---
+
+## 9. WELCOME POPUP (IMPORTANT FIXED VERSION)
+**STYLE:**
+* Glassmorphism UI
+* blur background
+* centered modal
+* responsive
+* auto show on entry
+
+**Title:**  
+⚠️ توجه ⚠️
+
+**Text (Persian):**
+> به آرشیو «بهشت منهوا» خوش آمدید.  
+> این وب‌سایت تنها برای اعضایی در دسترس است که توسط مدیر تأیید شده‌اند.  
+> برای دریافت اخبار، اطلاعیه‌ها، رمزهای دسترسی و اطلاعات مهم، حتماً در کانال تلگرام ما عضو شوید. تمامی اطلاع‌رسانی‌ها از طریق کانال تلگرام انجام می‌شود.  
+> این آرشیو به دلیل کپی‌برداری، انتشار بدون اجازه و عدم ذکر منبع، به‌صورت خصوصی و محدود ارائه شده است.  
+> از حمایت و همراهی شما سپاسگزاریم. با تشکر مدیر آرشیو بهشت منهوا
+
+**BUTTON 1 (Telegram):**
+* Text: کانال تلگرامی ما
+* Link: https://t.me/heavenxmanh
+
+**BUTTON 2 (Close):**
+* Text: متوجه شدم
+
+**action:**
+* close popup
+* redirect to login page
+
+**ADMIN CONTROL:**
+* edit popup text
+* enable/disable popup
+* create multiple popups
+* schedule popup timing
+
+---
+
+## 10. COMMENTS & RATING
+**Per Chapter:**
+* comments (username + timestamp)
+* rating system (1–5 stars)
+
+**Admin:**
+* delete/edit comments
+* ban users
+* hide comments
+* reset ratings
+
+---
+
+## 11. READER FEATURES
+* zoom in/out
+* pinch zoom mobile
+* double click zoom desktop
+* fullscreen mode
+* invert colors toggle
+* brightness slider
+* contrast slider
+* night mode
+
+**Save per user:**
+* ALL settings persist
+
+---
+
+## 12. MULTI LANGUAGE
+**Languages:**
+* German
+* English
+* Persian (RTL support REQUIRED)
+
+**Features:**
+* language switch button
+* save preference
+* full UI translation
+
+---
+
+## 13. 🛠 ADMIN PANEL
+**Sidebar:**
+* Dashboard
+* Users
+* Manhwa + Chapter
+* Comments
+* Popup
+* Social Media
+* Languages
+* Design
+* Stats
+* Settings
+
+**Requirements:**
+* collapsible
+* clean structure
+* fast navigation
+
+---
+
+## 14. ⚙️ SYSTEM SETTINGS
+* change website name
+* colors
+* fonts
+* enable/disable site
+* maintenance mode
+* countdown system
+* global announcements
+
+---
+
+## 15. BANNER SYSTEM
+* upload header banner image
+* responsive:
+    * mobile
+    * tablet
+    * desktop
+* smart crop
+* optional overlay text
+
+---
+
+## 16. 📱 RESPONSIVE DESIGN
+* fully mobile + desktop + tablet
+* no layout bugs
+* no overflow issues
+* works on all browsers
+
+---
+
+## 17. 🚨 FINAL RULE
+System is NOT complete unless:
+* cover upload works
+* zip upload works
+* device lock works
+* popup works
+* admin panel works
+* comments + ratings work
+* reader tools work
+* responsive design works

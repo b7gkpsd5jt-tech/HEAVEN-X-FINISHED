@@ -1,0 +1,36 @@
+import { Router, Response } from "express";
+import { db } from "@workspace/db";
+import { usersTable, seriesTable, chaptersTable, chapterPagesTable, commentsTable } from "@workspace/db";
+import { count, desc } from "drizzle-orm";
+import { authenticate, requireAdmin, AuthRequest } from "../lib/auth";
+
+const router = Router();
+
+router.get("/stats", authenticate, requireAdmin, async (_req: AuthRequest, res: Response) => {
+  try {
+    const [userCount, seriesCount, chapterCount, pageCount, commentCount, recentUploads] = await Promise.all([
+      db.select({ count: count() }).from(usersTable).then(r => Number(r[0]?.count || 0)),
+      db.select({ count: count() }).from(seriesTable).then(r => Number(r[0]?.count || 0)),
+      db.select({ count: count() }).from(chaptersTable).then(r => Number(r[0]?.count || 0)),
+      db.select({ count: count() }).from(chapterPagesTable).then(r => Number(r[0]?.count || 0)),
+      db.select({ count: count() }).from(commentsTable).then(r => Number(r[0]?.count || 0)),
+      db.select().from(chaptersTable).orderBy(desc(chaptersTable.createdAt)).limit(10),
+    ]);
+
+    res.json({ userCount, seriesCount, chapterCount, pageCount, commentCount, recentUploads });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/all-comments", authenticate, requireAdmin, async (_req: AuthRequest, res: Response) => {
+  try {
+    const comments = await db.select().from(commentsTable).orderBy(desc(commentsTable.createdAt));
+    res.json(comments);
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+export default router;
