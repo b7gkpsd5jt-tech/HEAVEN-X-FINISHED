@@ -71,7 +71,6 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center p-4 relative">
       {/* Welcome popup shown on login page */}
       <WelcomePopup />
-
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -173,7 +172,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm rounded-xl transition-all shadow-sm hover:shadow-indigo-200 hover:shadow-md"
+              className="w-full py-3 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold text-sm rounded-xl transition-all shadow-sm hover:shadow-indigo-200 hover:shadow-md bg-foreground"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
