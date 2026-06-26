@@ -57,7 +57,7 @@ export default function Reader() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState("");
   const [rating, setRating] = useState(0);
-  const [ratingData, setRatingData] = useState<{ average: number; count: number } | null>(null);
+  const [ratingData, setRatingData] = useState<{ average: number; count: number; userRating?: number } | null>(null);
   const [allChapters, setAllChapters] = useState<{ id: string; number: number; title?: string }[]>([]);
   const lastScrollRef = useRef(0);
   const progressSavedRef = useRef(false);
@@ -80,6 +80,13 @@ export default function Reader() {
     apiFetch<Comment[]>(`/comments/chapter/${chapter.id}`).then(setComments).catch(() => {});
     apiFetch<{ id: string; number: number; title?: string }[]>(`/chapters/series/${chapter.series.id}`)
       .then(setAllChapters)
+      .catch(() => {});
+    // Load existing rating for this chapter
+    apiFetch<{ average: number; count: number; userRating: number }>(`/ratings/chapter/${chapter.id}`)
+      .then(data => {
+        setRatingData({ average: data.average, count: data.count });
+        if (data.userRating > 0) setRating(data.userRating);
+      })
       .catch(() => {});
   }, [chapter]);
 
@@ -132,11 +139,11 @@ export default function Reader() {
     if (!chapter || !user) return;
     setRating(stars);
     try {
-      const res = await apiFetch<{ average: number; count: number }>(`/ratings/chapter/${chapter.id}`, {
+      const res = await apiFetch<{ average: number; count: number; userRating: number }>(`/ratings/chapter/${chapter.id}`, {
         method: "POST",
         body: JSON.stringify({ stars }),
       });
-      setRatingData(res);
+      setRatingData({ average: res.average, count: res.count });
     } catch {}
   };
 

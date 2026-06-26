@@ -1,0 +1,24 @@
+Setze die folgenden Fehlerbehebungen und Features präzise und performant um. Bestehender Code darf nicht durch Vereinfachungen beschädigt werden.
+
+1. RATING-SYSTEM (STERNE) FIX:
+- Fehler: 1-5 Sterne werden nach Reload nicht in DB gespeichert.
+- To-Do: Fixe das DB-Persistence-Layer. Der Bewertungs-Durchschnitt muss nach Neuladen korrekt berechnet und angezeigt werden.
+- Constraint: Unique Constraint (1 Bewertung pro User pro Manhwa). Wenn User erneut bewertet -> Upsert (bestehende Bewertung aktualisieren).
+
+2. WEBSITE-EINSTELLUNGEN & DESIGN-SYSTEM:
+- Fehler: Einstellungen im Admin-Panel ohne Funktion. Derzeitige Primärfarbe ist Lila.
+- To-Do: Fixe alle Steuerelemente (Webseitenname, Logo-Upload, Wartungsmodus/Offline-Modus toggeln). Änderungen global in DB speichern.
+- CSS/Theme-Anpassung: Ersetze alle lila Elemente systemweit durch WEISS. Setze die primäre Hintergrund-/Basis-Farbe auf SCHWARZ. 
+
+3. HERO-BANNER-SYSTEM FIX:
+- Fehler: Upload-Fehler, Platzhalter und fehlerhafte Darstellung.
+- UI/UX: Implementiere responsives Hero-Banner (Desktop, Tablet, Mobile) mit "background-size: cover". 
+- Styling: Text liegt über dem Banner. Füge ein halbtransparentes, dunkles CSS-Overlay (40-60% Opacity) zwischen Bild und Text ein, um Lesbarkeit zu garantieren.
+- Admin: Volle CRUD-Funktionalität (Hochladen, Ersetzen, Löschen) mit sofortiger DB-Speicherung.
+
+4. ERWEITERUNG: MULTI-ZIP CHAPTER UPLOAD:
+- WICHTIG: Das bestehende Chapter-Upload-System muss zu 100% unverändert und intakt bleiben!
+- Neues Feature: Multi-Upload-Slot für bis zu 10 ZIP-Dateien gleichzeitig.
+- Backend-Logik: Jede ZIP entspricht 1 Chapter. Automatisch entpacken, Bilder alphanumerisch sortieren (01, 02, 03...), sequenziell als separate Chapter anlegen und dem ausgewählten Manhwa zuordnen.
+- UI: Fortschrittsanzeige (Progress Bar) pro ZIP-Datei während des Uploads.
+- Error-Handling: Option zum vollständigen Löschen eines fehlerhaften Chapters inklusive physischem Löschen aller zugehörigen Bilddateien vom Server (ohne andere Chapter/Manhwas zu beeinflussen).
