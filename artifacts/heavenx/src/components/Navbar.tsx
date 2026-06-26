@@ -8,7 +8,7 @@ import type { Lang } from "@/i18n";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { t, lang, setLang, isRTL } = useLang();
+  const { t, lang, setLang } = useLang();
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,18 +30,25 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav
+      className="sticky top-0 z-50 backdrop-blur-md"
+      style={{ background: "#000000", borderBottom: "1px solid #1a1a1a" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
           <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer select-none">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md">
-                <span className="text-white font-black text-sm tracking-tight">HX</span>
-              </div>
+            <div className="flex items-center gap-2.5 cursor-pointer select-none">
+              <img
+                src="/logo.png"
+                alt="HEAVENx"
+                className="h-10 w-10 object-contain"
+                style={{ filter: "drop-shadow(0 0 6px rgba(100,160,255,0.35))" }}
+              />
               <div>
-                <span className="font-black text-lg tracking-tight text-gray-900">HEAVEN</span>
-                <span className="font-black text-lg tracking-tight text-indigo-600">x</span>
+                <span className="font-black text-lg tracking-tight" style={{ color: "#f0f0f0" }}>HEAVEN</span>
+                <span className="font-black text-lg tracking-tight" style={{ color: "#ffffff" }}>x</span>
               </div>
             </div>
           </Link>
@@ -54,11 +61,13 @@ export default function Navbar() {
               return (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all ${
-                      active
-                        ? "bg-indigo-50 text-indigo-600"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                    }`}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all"
+                    style={{
+                      background: active ? "#1a1a1a" : "transparent",
+                      color: active ? "#ffffff" : "#888888",
+                    }}
+                    onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLDivElement).style.color = "#ffffff"; (e.currentTarget as HTMLDivElement).style.background = "#111111"; } }}
+                    onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLDivElement).style.color = "#888888"; (e.currentTarget as HTMLDivElement).style.background = "transparent"; } }}
                   >
                     <Icon size={15} />
                     {item.label}
@@ -72,24 +81,26 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {/* Search */}
             <form onSubmit={handleSearch} className="relative">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("search")}
-                className="w-44 pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 bg-gray-50"
+                className="w-44 pl-9 pr-3 py-2 text-sm rounded-lg focus:outline-none transition-all"
+                style={{ background: "#111", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
               />
             </form>
 
             {/* Language switcher */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: "#111" }}>
               {(["DE", "EN", "FA"] as Lang[]).map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}
-                  className={`px-2 py-1 text-xs font-bold rounded-md transition-all ${
-                    lang === l ? "bg-white shadow-sm text-indigo-600" : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className="px-2 py-1 text-xs font-bold rounded-md transition-all"
+                  style={lang === l
+                    ? { background: "#ffffff", color: "#000000" }
+                    : { background: "transparent", color: "#666" }}
                 >
                   {l}
                 </button>
@@ -99,14 +110,17 @@ export default function Navbar() {
             {/* Auth */}
             {user ? (
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span className="text-indigo-600 font-bold text-xs">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+                  <span className="font-bold text-xs" style={{ color: "#f0f0f0" }}>
                     {user.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-all"
+                  style={{ color: "#888" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#ff6b6b"; (e.currentTarget as HTMLButtonElement).style.background = "#1a0a0a"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "#888"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
                 >
                   <LogOut size={14} />
                   {t("logout")}
@@ -114,7 +128,10 @@ export default function Navbar() {
               </div>
             ) : (
               <Link href="/login">
-                <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-all shadow-sm">
+                <button
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+                  style={{ background: "#ffffff", color: "#000000" }}
+                >
                   <LogIn size={14} />
                   {t("login")}
                 </button>
@@ -124,7 +141,8 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg transition-all"
+            style={{ color: "#888" }}
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -139,16 +157,18 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden overflow-hidden border-t border-gray-100 bg-white"
+            className="md:hidden overflow-hidden"
+            style={{ borderTop: "1px solid #1a1a1a", background: "#000" }}
           >
             <div className="p-4 space-y-2">
               <form onSubmit={handleSearch} className="relative mb-3">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t("search")}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-gray-50"
+                  className="w-full pl-9 pr-3 py-2 text-sm rounded-lg focus:outline-none"
+                  style={{ background: "#111", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
                 />
               </form>
 
@@ -157,7 +177,8 @@ export default function Navbar() {
                 return (
                   <Link key={item.href} href={item.href}>
                     <div
-                      className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                      className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all"
+                      style={{ color: "#cccccc" }}
                       onClick={() => setMobileOpen(false)}
                     >
                       <Icon size={16} />
@@ -172,9 +193,10 @@ export default function Navbar() {
                   <button
                     key={l}
                     onClick={() => setLang(l)}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                      lang === l ? "bg-indigo-100 text-indigo-600" : "text-gray-500 bg-gray-100"
-                    }`}
+                    className="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                    style={lang === l
+                      ? { background: "#ffffff", color: "#000000" }
+                      : { background: "#1a1a1a", color: "#666" }}
                   >
                     {l}
                   </button>
@@ -184,7 +206,8 @@ export default function Navbar() {
               {user ? (
                 <button
                   onClick={() => { logout(); setMobileOpen(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all"
+                  style={{ color: "#ff6b6b" }}
                 >
                   <LogOut size={16} />
                   {t("logout")}
@@ -192,7 +215,8 @@ export default function Navbar() {
               ) : (
                 <Link href="/login">
                   <button
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg"
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg"
+                    style={{ background: "#ffffff", color: "#000000" }}
                     onClick={() => setMobileOpen(false)}
                   >
                     <LogIn size={16} />
