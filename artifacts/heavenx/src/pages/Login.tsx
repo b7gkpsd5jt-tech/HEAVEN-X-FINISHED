@@ -145,7 +145,6 @@ export default function Login() {
                   required
                   className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
                   style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
-                  placeholder="username"
                   autoComplete="username"
                   autoFocus
                 />
@@ -236,8 +235,14 @@ export default function Login() {
           )}
         </div>
 
-        <p className="text-center text-xs mt-4" style={{ color: "#333" }}>
-          © {new Date().getFullYear()} HEAVENx — بهشت منهوا
+        <p
+          className="text-center text-xs mt-4 leading-7"
+          dir="rtl"
+          style={{ color: "#444", fontFamily: "'Noto Nastaliq Urdu', serif" }}
+        >
+          بهشت منهوا آرشیو بزرگ منهوا ساخت سایت در سال 2026
+          <br />
+          برای هر مشکلی لطفاً به آدمین در تلگرام اطلاع بدهید
         </p>
       </motion.div>
     </div>
