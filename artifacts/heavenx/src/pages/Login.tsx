@@ -132,7 +132,7 @@ export default function Login() {
         {/* Card */}
         <div
           className="rounded-2xl p-7"
-          style={{ background: "#0f0f0f", border: "1px solid #1e1e1e" }}
+          style={{ background: "#0f0f0f", border: "1px solid #1a3a55", boxShadow: "0 0 40px rgba(0,136,204,0.18), 0 0 80px rgba(0,100,180,0.10), inset 0 0 30px rgba(0,80,160,0.06)" }}
         >
           <h2
             className="mb-5 text-center"
