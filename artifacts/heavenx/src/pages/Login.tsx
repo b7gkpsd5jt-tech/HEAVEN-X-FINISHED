@@ -129,11 +129,40 @@ export default function Login() {
           </h1>
         </div>
 
-        {/* Card */}
-        <div
-          className="rounded-2xl p-7"
-          style={{ background: "#0f0f0f", border: "1px solid #1e1e1e" }}
-        >
+        {/* Card with wings */}
+        <div className="relative">
+
+          {/* Left wing */}
+          <div className="absolute pointer-events-none select-none" style={{ left: "-72px", top: "50%", transform: "translateY(-50%)", width: "80px", opacity: 0.82 }}>
+            <svg viewBox="0 0 80 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M72 110 C55 85 18 55 2 8 C12 38 22 72 32 110 C22 148 12 182 2 212 C18 165 55 135 72 110Z" fill="white" opacity="0.95"/>
+              <path d="M72 110 C58 88 28 62 8 22 C16 50 26 78 36 110 C26 142 16 170 8 198 C28 158 58 132 72 110Z" fill="white" opacity="0.55"/>
+              <path d="M72 110 C62 92 40 70 18 40 C24 64 32 86 40 110 C32 134 24 156 18 180 C40 150 62 128 72 110Z" fill="white" opacity="0.3"/>
+              <path d="M72 110 C66 96 50 78 30 55 C35 76 40 92 45 110 C40 128 35 144 30 165 C50 142 66 124 72 110Z" fill="white" opacity="0.18"/>
+              {/* Feather tips */}
+              <path d="M32 110 C18 90 8 65 2 8" stroke="white" strokeWidth="0.8" strokeOpacity="0.4" fill="none"/>
+              <path d="M36 110 C24 95 14 75 8 22" stroke="white" strokeWidth="0.8" strokeOpacity="0.3" fill="none"/>
+              <path d="M40 110 C30 98 22 82 18 40" stroke="white" strokeWidth="0.8" strokeOpacity="0.25" fill="none"/>
+            </svg>
+          </div>
+
+          {/* Right wing (mirrored) */}
+          <div className="absolute pointer-events-none select-none" style={{ right: "-72px", top: "50%", transform: "translateY(-50%) scaleX(-1)", width: "80px", opacity: 0.82 }}>
+            <svg viewBox="0 0 80 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M72 110 C55 85 18 55 2 8 C12 38 22 72 32 110 C22 148 12 182 2 212 C18 165 55 135 72 110Z" fill="white" opacity="0.95"/>
+              <path d="M72 110 C58 88 28 62 8 22 C16 50 26 78 36 110 C26 142 16 170 8 198 C28 158 58 132 72 110Z" fill="white" opacity="0.55"/>
+              <path d="M72 110 C62 92 40 70 18 40 C24 64 32 86 40 110 C32 134 24 156 18 180 C40 150 62 128 72 110Z" fill="white" opacity="0.3"/>
+              <path d="M72 110 C66 96 50 78 30 55 C35 76 40 92 45 110 C40 128 35 144 30 165 C50 142 66 124 72 110Z" fill="white" opacity="0.18"/>
+              <path d="M32 110 C18 90 8 65 2 8" stroke="white" strokeWidth="0.8" strokeOpacity="0.4" fill="none"/>
+              <path d="M36 110 C24 95 14 75 8 22" stroke="white" strokeWidth="0.8" strokeOpacity="0.3" fill="none"/>
+              <path d="M40 110 C30 98 22 82 18 40" stroke="white" strokeWidth="0.8" strokeOpacity="0.25" fill="none"/>
+            </svg>
+          </div>
+
+          <div
+            className="rounded-2xl p-7"
+            style={{ background: "#0f0f0f", border: "1px solid #1e1e1e" }}
+          >
           <h2
             className="mb-5 text-center"
             style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", color: "#ffffff", textShadow: "0 1px 10px rgba(255,255,255,0.25)" }}
@@ -291,6 +320,7 @@ export default function Login() {
             </div>
           )}
         </div>
+        </div>{/* end card+wings wrapper */}
 
         <p
           className="text-center text-xs mt-4 leading-7"
