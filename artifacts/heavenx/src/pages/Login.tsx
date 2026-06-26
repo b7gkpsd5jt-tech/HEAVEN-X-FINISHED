@@ -150,7 +150,7 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
-                  style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
+                  style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
                   autoComplete="username"
                   autoFocus
                 />
@@ -170,7 +170,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full pl-9 pr-10 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
-                  style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
+                  style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
                   autoComplete="current-password"
                 />
                 <button
@@ -199,8 +199,14 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all"
-              style={{ background: "#ffffff", color: "#000000" }}
+              className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                color: "#ffffff",
+                border: "1px solid rgba(255,255,255,0.25)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 4px 20px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
