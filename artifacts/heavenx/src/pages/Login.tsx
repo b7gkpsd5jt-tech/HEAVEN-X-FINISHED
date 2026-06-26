@@ -15,6 +15,12 @@ interface SocialLink {
   isEnabled: boolean;
 }
 
+const TelegramIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.64-.203-.657-.64.136-.954l11.57-4.461c.537-.194 1.006.131.828.943z" fill="white"/>
+  </svg>
+);
+
 const PLATFORM_ICONS: Record<string, string> = {
   telegram: "✈",
   instagram: "📸",
@@ -215,8 +221,37 @@ export default function Login() {
               </p>
               <div className="flex flex-col gap-2">
                 {socialLinks.map((link) => {
+                  const isTelegram = link.platform === "telegram";
                   const colors = PLATFORM_COLORS[link.platform] || { bg: "#1a1a1a", hover: "#2a2a2a" };
-                  return (
+                  return isTelegram ? (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: "rgba(0, 136, 204, 0.15)",
+                        border: "1px solid rgba(0, 136, 204, 0.4)",
+                        backdropFilter: "blur(12px)",
+                        boxShadow: "0 4px 20px rgba(0,136,204,0.15), inset 0 1px 0 rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <TelegramIcon />
+                      <span
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          letterSpacing: "0.06em",
+                          color: "#ffffff",
+                          textShadow: "0 1px 8px rgba(0,136,204,0.6)",
+                        }}
+                      >
+                        {link.label || "Telegram"}
+                      </span>
+                    </a>
+                  ) : (
                     <a
                       key={link.id}
                       href={link.url}

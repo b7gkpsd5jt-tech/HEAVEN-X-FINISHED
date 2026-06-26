@@ -109,8 +109,8 @@ export default function WelcomePopup() {
                     rel="noopener noreferrer"
                     className="w-full py-3.5 rounded-2xl text-center font-semibold text-white text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
                     style={{
-                      background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                      boxShadow: "0 4px 20px rgba(99,102,241,0.45)",
+                      background: "linear-gradient(135deg, #0088cc 0%, #229ED9 100%)",
+                      boxShadow: "0 4px 20px rgba(0,136,204,0.45)",
                     }}
                   >
                     {popup.buttonText}
