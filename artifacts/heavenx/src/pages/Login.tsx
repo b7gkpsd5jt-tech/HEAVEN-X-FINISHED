@@ -238,7 +238,7 @@ export default function Login() {
         <p
           className="text-center text-xs mt-4 leading-7"
           dir="rtl"
-          style={{ color: "#444", fontFamily: "'Noto Nastaliq Urdu', serif" }}
+          style={{ color: "#444", fontFamily: "Inter, sans-serif" }}
         >
           بهشت منهوا آرشیو بزرگ منهوا ساخت سایت در سال 2026
           <br />
