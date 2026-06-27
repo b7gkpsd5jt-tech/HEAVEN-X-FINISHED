@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { seriesTable } from "./series";
@@ -31,7 +31,9 @@ export const ratingsTable = pgTable("ratings", {
   userId: text("user_id").notNull(),
   stars: integer("stars").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("ratings_chapter_user_idx").on(t.chapterId, t.userId),
+]);
 
 export const commentsTable = pgTable("comments", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
