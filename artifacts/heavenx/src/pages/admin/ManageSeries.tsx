@@ -16,13 +16,13 @@ interface Series {
 interface Form {
   title: string; altTitle: string; description: string;
   author: string; artist: string; status: string;
-  genres: string; titleFont: string;
+  genres: string; titleFont: string; authorFont: string; descriptionFont: string;
 }
 
 const EMPTY_FORM: Form = {
   title: "", altTitle: "", description: "",
   author: "", artist: "", status: "ONGOING",
-  genres: "", titleFont: "",
+  genres: "", titleFont: "", authorFont: "", descriptionFont: "",
 };
 
 const FA_FONTS = [
@@ -106,6 +106,8 @@ export default function ManageSeries() {
       status: s.status,
       genres: s.genres?.map(g => g.genre.name).join(", ") || "",
       titleFont: s.titleFont || "",
+      authorFont: (s as any).authorFont || "",
+      descriptionFont: (s as any).descriptionFont || "",
     });
     setCoverFile(null);
     const cv = s.cover ? (s.cover.startsWith("/uploads") ? `${API_BASE.replace("/api", "")}${s.cover}` : s.cover) : "";
@@ -136,6 +138,8 @@ export default function ManageSeries() {
         status: form.status,
         genres: form.genres ? form.genres.split(",").map(g => g.trim()).filter(Boolean) : [],
         titleFont: form.titleFont || null,
+        authorFont: form.authorFont || null,
+        descriptionFont: form.descriptionFont || null,
       };
 
       let saved: Series;
@@ -400,7 +404,7 @@ export default function ManageSeries() {
                   <input
                     value={form.author}
                     onChange={e => setForm(f => ({ ...f, author: e.target.value }))}
-                    style={inputCls}
+                    style={{ ...inputCls, fontFamily: form.authorFont || undefined }}
                   />
                 </div>
                 <div>
@@ -411,6 +415,32 @@ export default function ManageSeries() {
                     style={inputCls}
                   />
                 </div>
+              </div>
+
+              {/* Author Font */}
+              <div>
+                <Label>
+                  <span className="flex items-center gap-1.5">
+                    <Type size={11} style={{ display: "inline" }} />
+                    فونت نویسنده (Author Font)
+                  </span>
+                </Label>
+                <select
+                  value={form.authorFont}
+                  onChange={e => setForm(f => ({ ...f, authorFont: e.target.value }))}
+                  style={{ ...inputCls, cursor: "pointer", fontFamily: form.authorFont || undefined }}
+                >
+                  {FA_FONTS.map(f => (
+                    <option key={f.value} value={f.value} style={{ background: D.panel, fontFamily: f.value || undefined }}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+                {form.authorFont && form.author && (
+                  <p className="mt-2 text-sm px-3 py-1.5 rounded-lg" style={{ background: D.input, color: D.text, fontFamily: form.authorFont, border: `1px solid ${D.border}` }}>
+                    {form.author}
+                  </p>
+                )}
               </div>
 
               {/* Status */}
@@ -476,8 +506,34 @@ export default function ManageSeries() {
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={4}
-                  style={{ ...inputCls, resize: "none", lineHeight: 1.6 }}
+                  style={{ ...inputCls, resize: "none", lineHeight: 1.6, fontFamily: form.descriptionFont || undefined }}
                 />
+              </div>
+
+              {/* Description Font */}
+              <div>
+                <Label>
+                  <span className="flex items-center gap-1.5">
+                    <Type size={11} style={{ display: "inline" }} />
+                    فونت توضیحات (Description Font)
+                  </span>
+                </Label>
+                <select
+                  value={form.descriptionFont}
+                  onChange={e => setForm(f => ({ ...f, descriptionFont: e.target.value }))}
+                  style={{ ...inputCls, cursor: "pointer", fontFamily: form.descriptionFont || undefined }}
+                >
+                  {FA_FONTS.map(f => (
+                    <option key={f.value} value={f.value} style={{ background: D.panel, fontFamily: f.value || undefined }}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+                {form.descriptionFont && form.description && (
+                  <p className="mt-2 text-sm px-3 py-1.5 rounded-lg" style={{ background: D.input, color: D.text, fontFamily: form.descriptionFont, border: `1px solid ${D.border}`, lineHeight: 1.7, direction: "rtl" }}>
+                    {form.description.slice(0, 100)}{form.description.length > 100 ? "…" : ""}
+                  </p>
+                )}
               </div>
 
               {/* Actions */}
