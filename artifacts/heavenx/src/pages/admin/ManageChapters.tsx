@@ -2,7 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { useSearch } from "wouter";
 import { apiFetch, apiUpload, API_BASE } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
-import { Upload, Trash2, Archive, Images, ChevronDown, BookOpen, X, Package } from "lucide-react";
+import { Upload, Trash2, Archive, Images, ChevronDown, BookOpen, X, Package, MessageSquare, Eye, EyeOff } from "lucide-react";
+
+interface SeriesComment {
+  id: string; chapterId: string; userId: string; username: string;
+  text: string; isHidden: string; createdAt: string; chapterNumber?: number;
+}
 
 interface Series { id: string; title: string }
 interface Chapter { id: string; number: number; title?: string; pageCount: number; views: number; createdAt: string }
@@ -36,6 +41,11 @@ export default function ManageChapters() {
   const multiZipRef = useRef<HTMLInputElement>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  // Comments state
+  const [seriesComments, setSeriesComments] = useState<SeriesComment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentActionId, setCommentActionId] = useState<string | null>(null);
+
   // Multi-ZIP state
   const [multiZipEntries, setMultiZipEntries] = useState<MultiZipEntry[]>([]);
   const [startChapterNum, setStartChapterNum] = useState("");
@@ -54,6 +64,34 @@ export default function ManageChapters() {
   };
 
   useEffect(() => { loadChapters(); }, [selectedSeries]);
+
+  const loadComments = async () => {
+    if (!selectedSeries) return;
+    setCommentsLoading(true);
+    try {
+      const data = await apiFetch<SeriesComment[]>(`/admin/series/${selectedSeries}/comments`);
+      setSeriesComments(data);
+    } catch {} finally { setCommentsLoading(false); }
+  };
+
+  useEffect(() => { loadComments(); }, [selectedSeries]);
+
+  const handleHideComment = async (id: string, hidden: boolean) => {
+    setCommentActionId(id);
+    try {
+      await apiFetch(`/comments/${id}/${hidden ? "hide" : "unhide"}`, { method: "PATCH" });
+      setSeriesComments(prev => prev.map(c => c.id === id ? { ...c, isHidden: hidden ? "true" : "false" } : c));
+    } catch {} finally { setCommentActionId(null); }
+  };
+
+  const handleDeleteComment = async (id: string) => {
+    if (!confirm("Kommentar löschen?")) return;
+    setCommentActionId(id);
+    try {
+      await apiFetch(`/comments/${id}`, { method: "DELETE" });
+      setSeriesComments(prev => prev.filter(c => c.id !== id));
+    } catch {} finally { setCommentActionId(null); }
+  };
 
   // ── Single ZIP upload ──
   const handleZipUpload = async (e: React.FormEvent) => {
@@ -428,7 +466,7 @@ export default function ManageChapters() {
           </div>
 
           {/* Chapter list */}
-          <div className="rounded-2xl border" style={{ background: "#111", borderColor: "#222" }}>
+          <div className="rounded-2xl border mb-6" style={{ background: "#111", borderColor: "#222" }}>
             <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #1e1e1e" }}>
               <h2 className="font-semibold" style={{ color: "#f0f0f0" }}>Kapitel — {selectedSeriesName}</h2>
               <span className="text-sm" style={{ color: "#555" }}>{chapters.length} gesamt</span>
@@ -475,6 +513,87 @@ export default function ManageChapters() {
                     <p className="text-sm">{t("noResults")}</p>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+          {/* Comments section */}
+          <div className="rounded-2xl border" style={{ background: "#111", borderColor: "#222" }}>
+            <div className="px-5 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid #1e1e1e" }}>
+              <div className="flex items-center gap-2">
+                <MessageSquare size={16} style={{ color: "#60cfff" }} />
+                <h2 className="font-semibold" style={{ color: "#f0f0f0" }}>Kommentare</h2>
+              </div>
+              <span className="text-sm" style={{ color: "#555" }}>{seriesComments.length} gesamt</span>
+            </div>
+
+            {commentsLoading ? (
+              <div className="p-5 space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-14 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
+                ))}
+              </div>
+            ) : seriesComments.length === 0 ? (
+              <div className="py-12 text-center" style={{ color: "#444" }}>
+                <MessageSquare size={32} className="mx-auto mb-2 opacity-30" />
+                <p className="text-sm">Keine Kommentare</p>
+              </div>
+            ) : (
+              <div>
+                {seriesComments.map((c, idx) => {
+                  const hidden = c.isHidden === "true";
+                  const busy = commentActionId === c.id;
+                  return (
+                    <div
+                      key={c.id}
+                      className="flex items-start gap-3 px-5 py-3"
+                      style={{
+                        borderBottom: idx < seriesComments.length - 1 ? "1px solid #1a1a1a" : "none",
+                        opacity: hidden ? 0.5 : 1,
+                      }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <span className="text-xs font-semibold" style={{ color: "#60cfff" }}>{c.username}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: "#1a1a1a", color: "#555" }}>
+                            Ch.{c.chapterNumber ?? "?"}
+                          </span>
+                          {hidden && (
+                            <span className="text-xs px-1.5 py-0.5 rounded font-medium" style={{ background: "#2a1a00", color: "#f59e0b" }}>
+                              مخفی
+                            </span>
+                          )}
+                          <span className="text-xs" style={{ color: "#444" }}>
+                            {new Date(c.createdAt).toLocaleDateString("fa-IR")}
+                          </span>
+                        </div>
+                        <p className="text-sm" style={{ color: "#ccc" }}>{c.text}</p>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleHideComment(c.id, !hidden)}
+                          disabled={busy}
+                          title={hidden ? "Einblenden" : "Ausblenden"}
+                          className="p-2 rounded-lg transition-all disabled:opacity-50"
+                          style={{ color: hidden ? "#66cc66" : "#f59e0b" }}
+                        >
+                          {hidden ? <Eye size={14} /> : <EyeOff size={14} />}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteComment(c.id)}
+                          disabled={busy}
+                          title="Löschen"
+                          className="p-2 rounded-lg transition-all disabled:opacity-50"
+                          style={{ color: "#555" }}
+                          onMouseEnter={e => (e.currentTarget.style.color = "#ff6b6b")}
+                          onMouseLeave={e => (e.currentTarget.style.color = "#555")}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

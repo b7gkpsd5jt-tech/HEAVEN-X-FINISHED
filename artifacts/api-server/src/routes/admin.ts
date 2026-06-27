@@ -49,4 +49,29 @@ router.get("/all-comments", authenticate, requireAdmin, async (_req: AuthRequest
   }
 });
 
+// GET all comments for all chapters of a specific series
+router.get("/series/:seriesId/comments", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const rows = await db
+      .select({
+        id: commentsTable.id,
+        chapterId: commentsTable.chapterId,
+        userId: commentsTable.userId,
+        username: commentsTable.username,
+        text: commentsTable.text,
+        isHidden: commentsTable.isHidden,
+        createdAt: commentsTable.createdAt,
+        chapterNumber: chaptersTable.number,
+      })
+      .from(commentsTable)
+      .innerJoin(chaptersTable, eq(commentsTable.chapterId, chaptersTable.id))
+      .where(eq(chaptersTable.seriesId, req.params.seriesId))
+      .orderBy(desc(commentsTable.createdAt));
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
