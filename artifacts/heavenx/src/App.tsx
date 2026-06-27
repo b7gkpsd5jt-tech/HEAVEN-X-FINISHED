@@ -1,8 +1,8 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { LangProvider } from "@/contexts/LangContext";
 import Navbar from "@/components/Navbar";
 import NotFound from "@/pages/not-found";
@@ -91,14 +91,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <LangProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <AppRoutes />
-            </WouterRouter>
-            <Toaster />
-          </LangProvider>
-        </AuthProvider>
+        <LangProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <AppRoutes />
+          </WouterRouter>
+          <Toaster />
+        </LangProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
