@@ -25,6 +25,7 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+// Generate or retrieve device fingerprint
 function getDeviceId(): string {
   let id = localStorage.getItem("hx_device_id");
   if (!id) {
@@ -72,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// DIESER EXPORT IST ENTSCHEIDEND FÜR DEN BUILD
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
