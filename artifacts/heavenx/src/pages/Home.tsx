@@ -71,10 +71,62 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="font-black text-white tracking-tight mb-2"
-              style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}>
-              HEAVEN<span style={{ color: "#ffffff", textShadow: "0 0 30px rgba(255,255,255,0.6)" }}>x</span>
-            </h1>
+            {/* Angel-wing banner title */}
+            <div className="flex items-center justify-center gap-3 mb-2">
+
+              {/* Left wing */}
+              <svg width="70" height="90" viewBox="0 0 70 90" fill="none" style={{ opacity: 0.88, flexShrink: 0 }}>
+                <path d="M62 45 C44 32 12 18 2 2 C10 22 20 34 30 45 C20 56 10 68 2 88 C12 72 44 58 62 45Z" fill="white" opacity="0.95"/>
+                <path d="M62 45 C48 34 22 22 8 6 C14 26 22 36 32 45 C22 54 14 64 8 84 C22 68 48 56 62 45Z" fill="white" opacity="0.55"/>
+                <path d="M62 45 C52 36 32 26 16 12 C20 30 26 38 34 45 C26 52 20 60 16 78 C32 64 52 54 62 45Z" fill="white" opacity="0.3"/>
+                <path d="M62 45 C56 38 42 30 26 18 C28 34 32 40 36 45 C32 50 28 56 26 72 C42 60 56 52 62 45Z" fill="white" opacity="0.15"/>
+                <path d="M30 45 C18 32 8 18 2 2" stroke="white" strokeWidth="0.7" strokeOpacity="0.5" fill="none"/>
+                <path d="M32 45 C22 34 12 22 8 6" stroke="white" strokeWidth="0.6" strokeOpacity="0.35" fill="none"/>
+              </svg>
+
+              {/* Text */}
+              <div style={{ position: "relative" }}>
+                {/* Blue lightning glow behind X */}
+                <div style={{
+                  position: "absolute", right: "-4px", top: "50%", transform: "translateY(-50%)",
+                  width: "38px", height: "100%",
+                  background: "radial-gradient(ellipse at center, rgba(0,160,255,0.55) 0%, transparent 70%)",
+                  filter: "blur(6px)",
+                  pointerEvents: "none",
+                }} />
+                <h1
+                  style={{
+                    fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
+                    fontWeight: 900,
+                    letterSpacing: "0.04em",
+                    color: "#ffffff",
+                    textShadow: "0 0 20px rgba(255,255,255,0.7), 0 2px 8px rgba(0,0,0,0.8)",
+                    lineHeight: 1,
+                    margin: 0,
+                    position: "relative",
+                  }}
+                >
+                  HEAVEN
+                  <span style={{
+                    color: "#60cfff",
+                    textShadow: "0 0 12px rgba(0,180,255,1), 0 0 28px rgba(0,140,255,0.8), 0 0 48px rgba(0,100,220,0.5)",
+                  }}>x</span>
+                </h1>
+              </div>
+
+              {/* Right wing (mirrored — dark/blue tinted like logo) */}
+              <svg width="70" height="90" viewBox="0 0 70 90" fill="none" style={{ opacity: 0.88, flexShrink: 0, transform: "scaleX(-1)" }}>
+                <path d="M62 45 C44 32 12 18 2 2 C10 22 20 34 30 45 C20 56 10 68 2 88 C12 72 44 58 62 45Z" fill="#4ab8ff" opacity="0.6"/>
+                <path d="M62 45 C48 34 22 22 8 6 C14 26 22 36 32 45 C22 54 14 64 8 84 C22 68 48 56 62 45Z" fill="#60d0ff" opacity="0.35"/>
+                <path d="M62 45 C52 36 32 26 16 12 C20 30 26 38 34 45 C26 52 20 60 16 78 C32 64 52 54 62 45Z" fill="#80e0ff" opacity="0.2"/>
+                <path d="M30 45 C18 32 8 18 2 2" stroke="#60cfff" strokeWidth="0.9" strokeOpacity="0.8" fill="none"/>
+                <path d="M32 45 C22 34 12 22 8 6" stroke="#40b8ff" strokeWidth="0.7" strokeOpacity="0.5" fill="none"/>
+                {/* Lightning bolt on right wing */}
+                <path d="M48 20 L38 40 L44 40 L34 65" stroke="#60cfff" strokeWidth="1.5" strokeOpacity="0.85" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M48 20 L38 40 L44 40 L34 65" stroke="white" strokeWidth="0.5" strokeOpacity="0.4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+
+            </div>
             <p className="text-white/75 mb-1" style={{ fontSize: "clamp(0.8rem, 2vw, 1.1rem)" }}>
               {settings.bannerOverlayText || "بهشت منهوا — بهترین مانهواها به زبان فارسی"}
             </p>
