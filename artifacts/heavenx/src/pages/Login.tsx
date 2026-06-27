@@ -10,9 +10,9 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // ورود برای دسترسی ادمین
-    if (username === "admin" && password === "Hamid4747") {
-      localStorage.setItem("user", JSON.stringify({ role: "ADMIN", name: "Admin" }));
+    // Hardcoded Admin-Check wie gewünscht
+    if (username === "Dexter" && password === "Hamid4747") {
+      localStorage.setItem("user", JSON.stringify({ role: "ADMIN", name: "Dexter" }));
       window.location.hash = "/admin";
       setLoading(false);
       return;
@@ -23,55 +23,69 @@ export default function Login() {
         method: "POST",
         body: JSON.stringify({ username, password }),
       });
-
       if (res.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
         window.location.hash = "/admin";
-      } else {
-        throw new Error();
       }
     } catch (err) {
-      alert("نام کاربری یا رمز عبور اشتباه است.");
+      alert("Login fehlgeschlagen.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a] text-white">
-      <form onSubmit={handleLogin} className="bg-[#111] p-8 rounded-2xl w-full max-w-sm border border-[#222]">
-        {/* لوگو و نوشته آبی با همان استایل پنل */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="text-blue-600 mb-2">
-            {/* اینجا می‌تونی تگ img برای لوگوی خودت قرار بدی */}
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          </div>
-          <h1 className="text-4xl font-bold text-blue-600 tracking-tight">Heaven-X</h1>
-          <p className="text-blue-600 font-bold mt-1">بهشت من هوا</p>
+    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-4 text-white">
+      {/* Header Bereich wie in image.png */}
+      <div className="mb-8 flex flex-col items-center">
+        <div className="w-32 h-32 mb-6 rounded-2xl border border-blue-500/30 shadow-[0_0_25px_rgba(59,130,246,0.4)] overflow-hidden">
+          <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
+        <h1 className="text-3xl font-bold text-blue-400" style={{ textShadow: "0 0 15px rgba(96,165,250,0.6)" }}>
+          بهشت منها
+        </h1>
+      </div>
+
+      {/* Login Box */}
+      <div className="w-full max-w-sm bg-[#0a0a0a] border border-blue-900/50 p-8 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+        <h2 className="text-xl text-blue-400 font-bold text-center mb-8 tracking-wider">Login</h2>
         
-        <input 
-          className="w-full p-3 mb-4 bg-black border border-gray-700 rounded-lg text-white"
-          placeholder="Username" 
-          onChange={e => setUsername(e.target.value)} 
-          required 
-        />
-        <input 
-          className="w-full p-3 mb-6 bg-black border border-gray-700 rounded-lg text-white"
-          type="password" 
-          placeholder="Password" 
-          onChange={e => setPassword(e.target.value)} 
-          required 
-        />
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors" 
-          disabled={loading}
-        >
-          {loading ? "در حال ورود..." : "ورود"}
-        </button>
-      </form>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-blue-400 text-sm mb-2">Username</label>
+            <input 
+              className="w-full p-4 bg-[#050505] border border-blue-900/50 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
+              onChange={e => setUsername(e.target.value)} 
+              required 
+            />
+          </div>
+          <div>
+            <label className="block text-blue-400 text-sm mb-2">Password</label>
+            <input 
+              type="password"
+              className="w-full p-4 bg-[#050505] border border-blue-900/50 rounded-xl text-white outline-none focus:border-blue-500 transition-all"
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
+          </div>
+          <button 
+            type="submit" 
+            className="w-full p-4 bg-[#111] border border-blue-900/50 text-white rounded-xl font-bold hover:bg-blue-900/20 transition-all"
+            disabled={loading}
+          >
+            {loading ? "Wird geladen..." : "Login"}
+          </button>
+        </form>
+
+        {/* Telegram Button Sektion */}
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 text-xs mb-4">مارو دنبال کن</p>
+          <button className="w-full p-4 bg-[#050505] border border-blue-900/50 text-white rounded-xl flex items-center justify-center gap-2 hover:border-blue-500 transition-all">
+            <span>Telegram</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
