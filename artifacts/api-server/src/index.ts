@@ -1,5 +1,31 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { db } from "@workspace/db";
+import { popupsTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
+
+const DEFAULT_POPUP_ID = "welcome-default";
+
+async function seedDefaultPopup() {
+  try {
+    const existing = await db.select().from(popupsTable).where(eq(popupsTable.id, DEFAULT_POPUP_ID));
+    if (existing.length === 0) {
+      await db.insert(popupsTable).values({
+        id: DEFAULT_POPUP_ID,
+        title: "به بهشت منهوا خوش آمدید",
+        content: `تمام آثار داخل سایت قرار می‌گیرند. این سایت عمومی نیست و فقط کاربران مجاز می‌توانند وارد شوند.\n\nدسترسی به سایت فقط از طریق نام کاربری و رمز عبور شخصی امکان‌پذیر است و هر فرد حساب مخصوص به خود را دارد.\n\nبرای دسترسی به سایت هیچ‌گونه پرداختی نیاز نیست. این محدودیت فقط به دلایل امنیتی و جلوگیری از سوءاستفاده و انتشار غیرمجاز اعمال شده است در صورت نیاز به دریافت دسترسی یا اطلاعات بیشتر، لطفاً عضو کانال تلگرامی ما شوید`,
+        buttonText: "کانال تلگرام",
+        buttonUrl: "https://t.me/heavenxmanh",
+        closeText: "متوجه شدم",
+        isEnabled: true,
+        displayDurationHours: null,
+      });
+      logger.info("Default welcome popup seeded");
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to seed default popup");
+  }
+}
 
 const rawPort = process.env["PORT"];
 
@@ -22,4 +48,5 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  seedDefaultPopup();
 });
