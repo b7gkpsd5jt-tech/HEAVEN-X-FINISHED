@@ -14,6 +14,7 @@ export const siteSettingsTable = pgTable("site_settings", {
   fontFamily: text("font_family").notNull().default("Inter"),
   bannerUrl: text("banner_url"),
   bannerOverlayText: text("banner_overlay_text"),
+  bannerOverlayFont: text("banner_overlay_font"),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
