@@ -572,7 +572,7 @@ export default function Reader() {
           <div className="space-y-3">
             {comments.length === 0 ? (
               <div className="text-center py-10 text-sm" style={{ color: "#444" }}>
-                هنوز کامنتی نیست. اولین نفر باش!
+                هنوز کامنتی نیست. اولین نفر باش
               </div>
             ) : (
               [...comments].reverse().map((c) => (
