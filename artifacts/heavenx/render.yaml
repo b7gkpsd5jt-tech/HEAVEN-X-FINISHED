@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: heavenx-frontend
+    env: static
+    routes:
+      - source: /*
+        destination: /index.html
+        type: rewrite
