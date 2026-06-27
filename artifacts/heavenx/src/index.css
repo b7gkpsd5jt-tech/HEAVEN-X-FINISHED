@@ -204,6 +204,11 @@ input, textarea, select {
 }
 input::placeholder, textarea::placeholder { color: #555555; }
 
+/* ==================== GLOBAL BLUE TEXT ==================== */
+body * {
+  color: #60cfff !important;
+}
+
 /* ==================== BASE FONT (DE / EN) ==================== */
 body,
 button,
