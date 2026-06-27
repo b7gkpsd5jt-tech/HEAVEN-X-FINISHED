@@ -117,13 +117,15 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 router.post("/", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const { title, altTitle, description, cover, banner, author, artist, status, genres, titleFont } = req.body;
+    const { title, altTitle, description, cover, banner, author, artist, status, genres, titleFont, authorFont, descriptionFont } = req.body;
     if (!title) { res.status(400).json({ error: "Title required" }); return; }
 
     const [series] = await db.insert(seriesTable).values({
       title, altTitle, description, cover, banner, author, artist,
       status: status || "ONGOING",
       titleFont: titleFont || null,
+      authorFont: authorFont || null,
+      descriptionFont: descriptionFont || null,
     }).returning();
 
     // Handle genres

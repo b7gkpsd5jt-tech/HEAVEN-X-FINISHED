@@ -15,6 +15,8 @@ export const seriesTable = pgTable("series", {
   artist: text("artist"),
   status: seriesStatusEnum("status").notNull().default("ONGOING"),
   titleFont: text("title_font"),
+  authorFont: text("author_font"),
+  descriptionFont: text("description_font"),
   views: integer("views").notNull().default(0),
   likes: integer("likes").notNull().default(0),
   popularity: integer("popularity").notNull().default(0),
