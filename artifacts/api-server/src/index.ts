@@ -1,10 +1,34 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import bcrypt from "bcrypt";
 import { db } from "@workspace/db";
-import { popupsTable } from "@workspace/db";
+import { popupsTable, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 
 const DEFAULT_POPUP_ID = "welcome-default";
+
+async function seedAdminUser() {
+  const adminUsername = process.env["ADMIN_USERNAME"];
+  const adminPassword = process.env["ADMIN_PASSWORD"];
+  if (!adminUsername || !adminPassword) return;
+
+  try {
+    const existing = await db.select().from(usersTable).where(eq(usersTable.username, adminUsername.toLowerCase())).limit(1);
+    if (existing.length === 0) {
+      const hashed = await bcrypt.hash(adminPassword, 12);
+      await db.insert(usersTable).values({
+        username: adminUsername.toLowerCase(),
+        password: hashed,
+        role: "ADMIN",
+        language: "DE",
+        isActive: true,
+      });
+      logger.info({ username: adminUsername }, "Admin user seeded from env");
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to seed admin user");
+  }
+}
 
 async function seedDefaultPopup() {
   try {
@@ -48,5 +72,6 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  seedAdminUser();
   seedDefaultPopup();
 });
