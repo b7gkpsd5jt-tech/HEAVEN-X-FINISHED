@@ -210,7 +210,16 @@ input::placeholder, textarea::placeholder { color: #555555; }
   color: #ff4d4d !important;
 }
 
-/* ==================== BASE FONT (DE / EN) ==================== */
+/* ==================== FONTS ==================== */
+
+/* Auto-apply Lalezar for ANY Persian/Arabic character in any language mode */
+@font-face {
+  font-family: 'LalezarAuto';
+  src: local('Lalezar');
+  unicode-range: U+0600-U+06FF, U+0750-U+077F, U+FB50-U+FDFF, U+FE70-U+FEFF,
+                 U+200C, U+200D, U+200F, U+060C, U+061B, U+061F;
+}
+
 body,
 button,
 input,
@@ -219,10 +228,10 @@ select,
 p, span, div, a,
 h1, h2, h3, h4, h5, h6,
 label, li, td, th {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'LalezarAuto', 'Exo 2', sans-serif;
 }
 
-/* ==================== PERSIAN (FA) FONT ==================== */
+/* Full override when FA language is active */
 .lang-fa *,
 .lang-fa input,
 .lang-fa textarea,
