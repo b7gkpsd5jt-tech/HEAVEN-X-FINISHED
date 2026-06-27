@@ -1,5 +1,5 @@
 import { useState, ImgHTMLAttributes } from "react";
-import { BookOpen, ImageOff } from "lucide-react";
+import { ImageOff } from "lucide-react";
 
 type Variant = "cover" | "banner" | "page" | "logo" | "thumb";
 
@@ -12,14 +12,10 @@ interface SafeImageProps extends ImgHTMLAttributes<HTMLImageElement> {
 
 const PLACEHOLDER: Record<Variant, React.ReactNode> = {
   cover: (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0a1622,#111)" }}>
-      <BookOpen size={32} style={{ color: "#60cfff", opacity: 0.6 }} />
-    </div>
+    <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#0a1622,#111)" }} />
   ),
   thumb: (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: "#111" }}>
-      <BookOpen size={18} style={{ color: "#444" }} />
-    </div>
+    <div className="w-full h-full" style={{ background: "#111" }} />
   ),
   banner: (
     <div className="w-full h-full" style={{ background: "linear-gradient(135deg,#050d14,#0a1220)" }} />
@@ -28,7 +24,7 @@ const PLACEHOLDER: Record<Variant, React.ReactNode> = {
     <div className="w-full flex items-center justify-center py-16" style={{ background: "#0a0a0a" }}>
       <div className="flex flex-col items-center gap-2" style={{ color: "#333" }}>
         <ImageOff size={28} />
-        <span style={{ fontSize: 11 }}>page not available</span>
+        <span style={{ fontSize: 11 }}>صفحه در دسترس نیست</span>
       </div>
     </div>
   ),

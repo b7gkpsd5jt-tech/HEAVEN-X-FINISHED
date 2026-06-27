@@ -228,12 +228,17 @@ export default function ManageSeries() {
               >
                 {/* Cover */}
                 <div
-                  className="w-14 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
-                  style={{ height: 72, background: D.input, boxShadow: "0 0 12px rgba(0,180,255,0.2)" }}
+                  className="w-14 rounded-xl overflow-hidden flex-shrink-0"
+                  style={{ height: 72, background: "linear-gradient(135deg,#0a1622,#111)", boxShadow: "0 0 12px rgba(0,180,255,0.2)" }}
                 >
-                  {coverUrl
-                    ? <img src={coverUrl} alt={s.title} className="w-full h-full object-cover" />
-                    : <BookOpen size={18} style={{ color: D.muted }} />}
+                  {coverUrl && (
+                    <img
+                      src={coverUrl}
+                      alt={s.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    />
+                  )}
                 </div>
 
                 {/* Info */}
