@@ -10,23 +10,27 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
+    // ورود اضطراری برای دسترسی سریع
+    if (username === "admin" && password === "Hamid4747") {
+      localStorage.setItem("user", JSON.stringify({ role: "ADMIN", name: "Admin" }));
+      window.location.hash = "/admin";
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Sende Login-Daten an das Backend
       const res = await apiFetch<any>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ username, password }),
       });
 
-      // Speichere das Token oder die Benutzerinfo
       if (res.token) {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
-        
-        // Weiterleitung zum Admin-Bereich
         window.location.hash = "/admin";
       }
     } catch (err) {
-      alert("Login fehlgeschlagen. Bitte prüfe Benutzername und Passwort.");
+      alert("نام کاربری یا رمز عبور اشتباه است.");
     } finally {
       setLoading(false);
     }
@@ -35,7 +39,14 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a] text-white">
       <form onSubmit={handleLogin} className="bg-[#111] p-8 rounded-2xl w-full max-w-sm border border-[#222]">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        {/* لوگو و نوشته آبی رنگ */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-16 bg-blue-600 rounded-full mb-4 flex items-center justify-center text-white font-bold text-xl">
+            HX
+          </div>
+          <h1 className="text-4xl font-bold text-blue-600">Heaven-X</h1>
+        </div>
+        
         <input 
           className="w-full p-3 mb-4 bg-black border border-gray-700 rounded-lg text-white"
           placeholder="Username" 
@@ -45,16 +56,16 @@ export default function Login() {
         <input 
           className="w-full p-3 mb-6 bg-black border border-gray-700 rounded-lg text-white"
           type="password" 
-          placeholder="Passwort" 
+          placeholder="Password" 
           onChange={e => setPassword(e.target.value)} 
           required 
         />
         <button 
           type="submit" 
-          className="w-full bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-700" 
+          className="w-full bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors" 
           disabled={loading}
         >
-          {loading ? "Wird angemeldet..." : "Anmelden"}
+          {loading ? "در حال ورود..." : "ورود"}
         </button>
       </form>
     </div>
