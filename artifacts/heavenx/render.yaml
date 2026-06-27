@@ -2,7 +2,7 @@ services:
   - type: web
     name: heavenx-api
     runtime: node
-    buildCommand: npx pnpm@10 install --no-frozen-lockfile && cd lib/db && npx drizzle-kit push --config ./drizzle.config.ts && cd ../.. && npx tsc -p lib/db/tsconfig.json && cd artifacts/api-server && node build.mjs
+    buildCommand: npx pnpm@10 install --no-frozen-lockfile && npx tsc -p lib/db/tsconfig.json && cd artifacts/api-server && node build.mjs
     startCommand: node artifacts/api-server/dist/index.mjs
     plan: free
     envVars:
@@ -18,17 +18,3 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-
-  - type: static
-    name: heavenx-frontend
-    buildCommand: cd artifacts/heavenx && npx pnpm@10 install --no-frozen-lockfile && npx tsc -p lib/db/tsconfig.json && VITE_BASE_PATH=/ BASE_PATH=/ pnpm run build
-    staticPublishPath: ./artifacts/heavenx/dist/public
-    envVars:
-      - key: VITE_API_URL
-        value: https://heaven-x-finishedx.onrender.com
-      - key: VITE_BASE_PATH
-        value: /
-      - key: BASE_PATH
-        value: /
-      - key: NODE_ENV
-        value: production
