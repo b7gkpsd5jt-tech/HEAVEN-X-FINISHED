@@ -47,3 +47,6 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Uploaded media files (not needed in git)
+artifacts/api-server/uploads/
