@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams, Link, Redirect } from "wouter";
+import { useParams, Link } from "wouter";
 import { apiFetch, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Settings, Moon, Sun, ZoomIn, ZoomOut,
-  List, X, Star, Send, RotateCcw, Contrast, ImageOff
+  List, X, Star, RotateCcw, Contrast, ImageOff
 } from "lucide-react";
 
 interface Page { id: string; pageNumber: number; filePath: string; fileName: string; order: number }
@@ -81,7 +80,6 @@ function PageImage({ src, idx, zoom, filter, onVisible, horizontal }: {
       alt=""
       loading="lazy"
       onLoad={onVisible}
-      onError={() => setFailed(true)}
       style={{
         width: horizontal ? `${zoom}%` : `${zoom}%`,
         maxWidth: horizontal ? "100%" : "900px",
@@ -91,6 +89,7 @@ function PageImage({ src, idx, zoom, filter, onVisible, horizontal }: {
         margin: horizontal ? undefined : "0 auto",
         objectFit: "contain",
       }}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -98,7 +97,6 @@ function PageImage({ src, idx, zoom, filter, onVisible, horizontal }: {
 export default function Reader() {
   const { id } = useParams();
   const { t } = useLang();
-  const { user, loading: authLoading } = useAuth();
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<ReaderSettings>(loadSettings);
@@ -108,19 +106,15 @@ export default function Reader() {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentHPage, setCurrentHPage] = useState(0);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [commentText, setCommentText] = useState("");
-  const [rating, setRating] = useState(0);
-  const [ratingData, setRatingData] = useState<{ average: number; count: number; userRating?: number } | null>(null);
+  const [ratingData, setRatingData] = useState<{ average: number; count: number } | null>(null);
   const [allChapters, setAllChapters] = useState<{ id: string; number: number; title?: string }[]>([]);
   const lastScrollRef = useRef(0);
-  const progressSavedRef = useRef(false);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     setCurrentPage(1);
     setCurrentHPage(0);
-    progressSavedRef.current = false;
     apiFetch<Chapter>(`/chapters/${id}`)
       .then(setChapter).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
@@ -130,23 +124,11 @@ export default function Reader() {
     apiFetch<Comment[]>(`/comments/chapter/${chapter.id}`).then(setComments).catch(() => {});
     apiFetch<{ id: string; number: number; title?: string }[]>(`/chapters/series/${chapter.series.id}`)
       .then(setAllChapters).catch(() => {});
-    apiFetch<{ average: number; count: number; userRating: number }>(`/ratings/chapter/${chapter.id}`)
+    apiFetch<{ average: number; count: number }>(`/ratings/chapter/${chapter.id}`)
       .then(data => {
         setRatingData({ average: data.average, count: data.count });
-        if (data.userRating > 0) setRating(data.userRating);
       }).catch(() => {});
   }, [chapter]);
-
-  useEffect(() => {
-    if (!user || !chapter || progressSavedRef.current) return;
-    if (currentPage >= chapter.pages.length * 0.8) {
-      progressSavedRef.current = true;
-      apiFetch("/users/progress", {
-        method: "POST",
-        body: JSON.stringify({ seriesId: chapter.series.id, chapterId: chapter.id, page: currentPage }),
-      }).catch(() => {});
-    }
-  }, [currentPage, chapter, user]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -167,30 +149,6 @@ export default function Reader() {
     });
   }, []);
 
-  const submitComment = async () => {
-    if (!commentText.trim() || !chapter || !user) return;
-    try {
-      const c = await apiFetch<Comment>(`/comments/chapter/${chapter.id}`, {
-        method: "POST",
-        body: JSON.stringify({ text: commentText }),
-      });
-      setComments(prev => [...prev, c]);
-      setCommentText("");
-    } catch {}
-  };
-
-  const submitRating = async (stars: number) => {
-    if (!chapter || !user) return;
-    setRating(stars);
-    try {
-      const res = await apiFetch<{ average: number; count: number; userRating: number }>(`/ratings/chapter/${chapter.id}`, {
-        method: "POST",
-        body: JSON.stringify({ stars }),
-      });
-      setRatingData({ average: res.average, count: res.count });
-    } catch {}
-  };
-
   const buildFilter = () => {
     const parts: string[] = [];
     if (settings.brightness !== 100) parts.push(`brightness(${settings.brightness / 100})`);
@@ -199,9 +157,7 @@ export default function Reader() {
     return parts.join(" ") || "none";
   };
 
-  if (!authLoading && !user) return <Redirect to="/login" />;
-
-  if (loading || authLoading) return (
+  if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: DARK.bg }}>
       <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" style={{ borderColor: `${DARK.accent} ${DARK.accent} ${DARK.accent} transparent` }} />
     </div>
@@ -251,8 +207,6 @@ export default function Reader() {
                     onClick={btn.action}
                     className="p-2 rounded-xl transition-colors"
                     style={{ color: DARK.textMuted }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = DARK.hover; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
                   >
                     {btn.icon}
                   </button>
@@ -407,8 +361,6 @@ export default function Reader() {
                     style={ch.id === id
                       ? { background: "rgba(96,207,255,0.1)", color: DARK.accent, fontWeight: 600 }
                       : { color: DARK.text }}
-                    onMouseEnter={e => { if (ch.id !== id) (e.currentTarget as HTMLDivElement).style.background = DARK.hover; }}
-                    onMouseLeave={e => { if (ch.id !== id) (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
                   >
                     {t("chapter")} {ch.number}{ch.title ? `: ${ch.title}` : ""}
                   </div>
@@ -510,18 +462,18 @@ export default function Reader() {
             )}
           </div>
 
-          {/* Rating */}
+          {/* Rating (Display Only) */}
           <div className="rounded-2xl p-4 mb-4" style={{ background: DARK.panel, border: `1px solid ${DARK.border}` }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: DARK.textMuted }}>{t("rating") || "امتیاز"}</p>
             <div className="flex gap-2 items-center">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <button key={s} onClick={() => submitRating(s)} disabled={!user}
-                  className="transition-transform active:scale-90">
-                  <Star size={26}
-                    className={s <= rating ? "fill-yellow-400" : ""}
-                    style={{ color: s <= rating ? "#facc15" : "#333" }} />
-                </button>
-              ))}
+              {[1, 2, 3, 4, 5].map((s) => {
+                const avg = ratingData ? Math.round(ratingData.average) : 0;
+                return (
+                  <Star key={s} size={26}
+                    className={s <= avg ? "fill-yellow-400" : ""}
+                    style={{ color: s <= avg ? "#facc15" : "#333" }} />
+                );
+              })}
               {ratingData && (
                 <span className="text-sm ml-2" style={{ color: DARK.textMuted }}>
                   {Number(ratingData.average).toFixed(1)} <span style={{ color: "#555" }}>({ratingData.count})</span>
@@ -542,31 +494,6 @@ export default function Reader() {
               )}
             </h3>
           </div>
-
-          {/* Add comment */}
-          {user ? (
-            <div className="flex gap-2 mb-4">
-              <input
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder={t("addComment") || "کامنت بنویس..."}
-                className="flex-1 px-4 py-2.5 text-sm rounded-xl focus:outline-none"
-                style={{ background: DARK.panel, color: DARK.text, border: `1px solid ${DARK.border}` }}
-                onKeyDown={(e) => e.key === "Enter" && submitComment()}
-              />
-              <button
-                onClick={submitComment}
-                className="px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5 text-sm font-medium"
-                style={{ background: DARK.accent, color: "#000" }}
-              >
-                <Send size={14} />
-              </button>
-            </div>
-          ) : (
-            <div className="mb-4 px-4 py-3 rounded-xl text-sm text-center" style={{ background: DARK.panel, color: DARK.textMuted, border: `1px solid ${DARK.border}` }}>
-              <Link href="/login"><span style={{ color: DARK.accent }}>ورود</span></Link> کن تا کامنت بذاری
-            </div>
-          )}
 
           {/* Comment list */}
           <div className="space-y-3">
