@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "wouter";
 import { apiFetch, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Eye, Heart, ChevronDown, ChevronUp, MessageSquare, Send } from "lucide-react";
+import { Eye, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
 import SafeImage from "@/components/SafeImage";
 
 interface Genre { genre: { id: string; name: string } }
@@ -40,11 +39,11 @@ function timeAgo(date: string) {
 
 function AvatarCircle({ name }: { name: string }) {
   const colors = ["#60cfff","#a78bfa","#34d399","#fb923c","#f472b6","#facc15"];
-  const color = colors[(name.charCodeAt(0) || 0) % colors.length];
+  const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
   return (
     <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
       style={{ background: color + "22", border: `1.5px solid ${color}55`, color }}>
-      {name[0]?.toUpperCase() || "?"}
+      {name?.[0]?.toUpperCase() || "?"}
     </div>
   );
 }
@@ -52,26 +51,20 @@ function AvatarCircle({ name }: { name: string }) {
 export default function SeriesDetail() {
   const { id } = useParams();
   const { t } = useLang();
-  const { user } = useAuth();
   const [series, setSeries] = useState<Series | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [chaptersExpanded, setChaptersExpanded] = useState(false);
   const [chaptersDesc, setChaptersDesc] = useState(true);
 
   const [comments, setComments] = useState<SeriesComment[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [sort, setSort] = useState<"newest" | "oldest">("newest");
-  const [commentText, setCommentText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [firstChapterId, setFirstChapterId] = useState<string>("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     apiFetch<Series>(`/series/${id}`)
-      .then(s => { setSeries(s); setFirstChapterId(s.chapters[0]?.id || ""); })
+      .then(s => { setSeries(s); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
@@ -86,37 +79,6 @@ export default function SeriesDetail() {
   };
 
   useEffect(() => { loadComments(); }, [id, sort]);
-
-  const toggleFavorite = async () => {
-    if (!user || !id) return;
-    try {
-      if (isFavorite) {
-        await apiFetch(`/users/favorites/${id}`, { method: "DELETE" });
-        setIsFavorite(false);
-      } else {
-        await apiFetch(`/users/favorites/${id}`, { method: "POST" });
-        setIsFavorite(true);
-      }
-    } catch {}
-  };
-
-  const handleSubmitComment = async () => {
-    if (!commentText.trim() || !firstChapterId || submitting) return;
-    setSubmitting(true);
-    try {
-      const newComment = await apiFetch<SeriesComment>(`/comments/chapter/${firstChapterId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: commentText.trim() }),
-      });
-      setCommentText("");
-      if (sort === "newest") {
-        setComments(prev => [{ ...newComment, chapterNumber: series?.chapters[0]?.number } as SeriesComment, ...prev]);
-      } else {
-        setComments(prev => [...prev, { ...newComment, chapterNumber: series?.chapters[0]?.number } as SeriesComment]);
-      }
-    } catch {} finally { setSubmitting(false); }
-  };
 
   const coverUrl = getImageUrl(series?.cover);
 
@@ -167,16 +129,6 @@ export default function SeriesDetail() {
                 <h1 className="text-xl font-black" style={{ color: "#f0f0f0" }}>{series.title}</h1>
                 {series.altTitle && <p className="text-xs mt-0.5" style={{ color: "#555" }}>{series.altTitle}</p>}
               </div>
-              {user && (
-                <button onClick={toggleFavorite}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all"
-                  style={isFavorite
-                    ? { background: "#2a0a0a", color: "#ff6b6b", border: "1px solid #ff3a3a33" }
-                    : { background: "#141414", color: "#888", border: "1px solid #222" }}>
-                  <Heart size={13} fill={isFavorite ? "currentColor" : "none"} />
-                  {isFavorite ? t("removeFavorite") : t("addFavorite")}
-                </button>
-              )}
             </div>
 
             <div className="flex flex-wrap gap-1.5 mt-2">
@@ -301,55 +253,6 @@ export default function SeriesDetail() {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Input */}
-          <div className="px-4 py-4" style={{ borderBottom: "1px solid #1a1a1a" }}>
-            {user ? (
-              <div className="flex gap-3">
-                <AvatarCircle name={user.username} />
-                <div className="flex-1">
-                  <textarea
-                    ref={textareaRef}
-                    value={commentText}
-                    onChange={e => setCommentText(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleSubmitComment(); }}
-                    placeholder="نظر خود را بنویسید..."
-                    rows={2}
-                    className="w-full px-3 py-2.5 text-sm rounded-xl resize-none focus:outline-none transition-all"
-                    style={{
-                      background: "#141414", color: "#e0e0e0",
-                      border: "1px solid #222", fontFamily: "inherit",
-                    }}
-                    onFocus={e => (e.currentTarget.style.borderColor = "#60cfff44")}
-                    onBlur={e => (e.currentTarget.style.borderColor = "#222")}
-                  />
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs" style={{ color: "#333" }}>Ctrl+Enter برای ارسال</span>
-                    <button
-                      onClick={handleSubmitComment}
-                      disabled={!commentText.trim() || submitting}
-                      className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all disabled:opacity-40"
-                      style={{ background: "#60cfff", color: "#000" }}>
-                      {submitting
-                        ? <div className="w-3 h-3 border border-black/30 border-t-black rounded-full animate-spin" />
-                        : <Send size={12} />}
-                      ارسال
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm" style={{ color: "#555" }}>برای نظر دادن وارد شوید</span>
-                <Link href="/login">
-                  <button className="px-4 py-1.5 rounded-xl text-xs font-bold transition-all"
-                    style={{ background: "#60cfff", color: "#000" }}>
-                    ورود
-                  </button>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Comment list */}
