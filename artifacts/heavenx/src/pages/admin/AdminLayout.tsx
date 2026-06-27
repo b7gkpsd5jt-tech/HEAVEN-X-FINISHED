@@ -1,6 +1,5 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LangContext";
 import {
   LayoutDashboard, BookOpen, Upload, Users, MessageSquare,
@@ -22,15 +21,9 @@ const sections = [
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth();
   const { t } = useLang();
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  if (!user || user.role !== "ADMIN") {
-    navigate("/login");
-    return null;
-  }
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -81,15 +74,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="p-3 border-t border-gray-100">
         <div className="flex items-center gap-3 px-3 py-2">
           <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-            <span className="text-indigo-600 font-bold text-xs">{user.username.charAt(0).toUpperCase()}</span>
+            <span className="text-indigo-600 font-bold text-xs">A</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-gray-800 truncate">{user.username}</p>
-            <p className="text-[10px] text-indigo-600 font-medium">{user.role}</p>
+            <p className="text-xs font-semibold text-gray-800 truncate">Admin</p>
+            <p className="text-[10px] text-indigo-600 font-medium">ADMIN</p>
           </div>
-          <button onClick={logout} className="text-gray-400 hover:text-red-500 transition-colors">
-            <LogOut size={15} />
-          </button>
+          <Link href="/">
+            <button className="text-gray-400 hover:text-red-500 transition-colors">
+              <LogOut size={15} />
+            </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -98,43 +93,3 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Desktop sidebar */}
-      <div className="hidden lg:flex flex-col w-56 bg-white border-r border-gray-100 flex-shrink-0 shadow-sm">
-        <SidebarContent />
-      </div>
-
-      {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="lg:hidden fixed inset-0 z-40 bg-black/30" onClick={() => setSidebarOpen(false)} />
-            <motion.div initial={{ x: -256 }} animate={{ x: 0 }} exit={{ x: -256 }} transition={{ type: "spring", damping: 30, stiffness: 300 }} className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-56 bg-white border-r border-gray-100 shadow-xl">
-              <button className="absolute top-4 right-3 text-gray-400" onClick={() => setSidebarOpen(false)}><X size={20} /></button>
-              <SidebarContent />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center gap-3 px-4 h-14 bg-white border-b border-gray-100 shadow-sm">
-          <button onClick={() => setSidebarOpen(true)} className="text-gray-600 hover:text-gray-900">
-            <Menu size={20} />
-          </button>
-          <span className="font-bold text-gray-900 flex-1">HEAVEN<span className="text-indigo-600">x</span> Admin</span>
-          <Link href="/">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 cursor-pointer transition-all">
-              <ArrowLeft size={13} />
-              بازگشت
-            </div>
-          </Link>
-        </div>
-
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
-      </div>
-    </div>
-  );
-}
