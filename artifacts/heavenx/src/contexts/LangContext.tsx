@@ -27,6 +27,11 @@ export function LangProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
     document.documentElement.lang = lang.toLowerCase();
+    if (lang === "FA") {
+      document.documentElement.classList.add("lang-fa");
+    } else {
+      document.documentElement.classList.remove("lang-fa");
+    }
   }, [isRTL, lang]);
 
   return (
