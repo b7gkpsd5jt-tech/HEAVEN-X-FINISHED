@@ -9,7 +9,9 @@ export default function ManageChapters() {
   const [multiZipEntries, setMultiZipEntries] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => { apiFetch<{ data: any[] }>("/series?limit=100").then(r => setAllSeries(r.data)); }, []);
+  useEffect(() => { 
+    apiFetch<{ data: any[] }>("/series?limit=100").then(r => setAllSeries(r.data)).catch(() => {}); 
+  }, []);
 
   const loadChapters = async () => {
     if (!selectedSeries) return;
@@ -40,6 +42,24 @@ export default function ManageChapters() {
   };
 
   return (
-    // ... (Dein JSX-Code hier, achte darauf, dass der "Jetzt hochladen" Button handleMultiZipUpload aufruft)
+    <div className="p-6 text-white">
+      <h1 className="text-2xl font-bold mb-4">Kapitelverwaltung</h1>
+      <select className="w-full p-2 bg-black border rounded mb-4" onChange={(e) => setSelectedSeries(e.target.value)}>
+        <option value="">Serie wählen</option>
+        {allSeries.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+      </select>
+      
+      <div className="space-y-4">
+        <button onClick={handleMultiZipUpload} disabled={uploading} className="bg-blue-600 px-4 py-2 rounded">
+          {uploading ? "Lädt hoch..." : "Alle hochladen"}
+        </button>
+        {chapters.map(ch => (
+          <div key={ch.id} className="flex justify-between items-center p-2 border-b">
+            <span>Kapitel {ch.number}</span>
+            <button onClick={() => handleDelete(ch.id)} className="text-red-500"><Trash2 /></button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
