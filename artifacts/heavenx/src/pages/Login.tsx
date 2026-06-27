@@ -14,7 +14,7 @@ export default function Login() {
 
     // 🔒 HIER DEINE ADMIN-ZUGANGSDATEN EINTRÄGEN
     const EXACT_ADMIN_USER = "admin";
-    const EXACT_ADMIN_PASS = "HeavenXAdmin2026!"; 
+    const EXACT_ADMIN_PASS = "Hamid4747!"; 
 
     if (username === EXACT_ADMIN_USER && password === EXACT_ADMIN_PASS) {
       localStorage.setItem("hx_admin_auth", "true");
