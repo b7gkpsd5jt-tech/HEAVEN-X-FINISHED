@@ -107,12 +107,26 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <img
-              src="/logo.png"
-              alt="HEAVENx Logo"
-              className="h-28 w-28 object-contain"
-              style={{ filter: "drop-shadow(0 0 16px rgba(100,160,255,0.4))" }}
-            />
+            <div
+              style={{
+                borderRadius: "22px",
+                padding: "4px",
+                background: "linear-gradient(145deg, rgba(0,180,255,0.25), rgba(0,80,160,0.1))",
+                boxShadow: "0 0 28px rgba(0,180,255,0.55), 0 0 60px rgba(0,120,220,0.3), 0 8px 24px rgba(0,0,0,0.7)",
+                transform: "perspective(400px) rotateX(4deg)",
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="HEAVENx Logo"
+                className="h-28 w-28 object-contain"
+                style={{
+                  borderRadius: "18px",
+                  display: "block",
+                  filter: "drop-shadow(0 0 8px rgba(0,180,255,0.3))",
+                }}
+              />
+            </div>
           </div>
           <h1
             dir="rtl"
@@ -120,9 +134,10 @@ export default function Login() {
               fontFamily: "'Reem Kufi', sans-serif",
               fontSize: "2.2rem",
               lineHeight: "1.5",
-              color: "#f0f0f0",
+              color: "#60cfff",
               fontWeight: 700,
               letterSpacing: "0.01em",
+              textShadow: "0 0 12px rgba(0,180,255,0.85), 0 0 28px rgba(0,140,220,0.5)",
             }}
           >
             بهشت منهوا
@@ -134,12 +149,10 @@ export default function Login() {
           className="rounded-2xl p-7"
           style={{ background: "#0f0f0f", border: "1px solid #1a3a55", boxShadow: "0 0 40px rgba(0,136,204,0.18), 0 0 80px rgba(0,100,180,0.10), inset 0 0 30px rgba(0,80,160,0.06)" }}
         >
-          <h2
-            className="mb-5 text-center"
-            style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "1.1rem", letterSpacing: "0.06em", color: "#ffffff", textShadow: "0 1px 10px rgba(255,255,255,0.25)" }}
-          >
+          <h2 className="mb-1 text-center" style={{ fontWeight: 700, fontSize: "1.2rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
             {t("login")}
           </h2>
+          <div className="mb-5 mx-auto rounded-full" style={{ height: "2px", width: "80px", background: "linear-gradient(90deg, rgba(0,180,255,0.1), #60cfff, rgba(0,180,255,0.1))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
