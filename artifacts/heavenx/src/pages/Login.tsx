@@ -61,17 +61,12 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    if (username !== "Dexter" || password !== "Hamid4747") {
-      setError("نام کاربری یا رمز عبور اشتباه است.");
-      setLoading(false);
-      return;
-    }
-
     try {
       await login(username, password);
     } catch (err: any) {
-      setError(t("loginError"));
+      const msg = err?.data?.error || err?.message || t("loginError");
+      setError(msg);
+    } finally {
       setLoading(false);
     }
   };
@@ -79,9 +74,18 @@ export default function Login() {
   const isRTL = (text: string) => /[\u0600-\u06FF]/.test(text);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative" style={{ background: "#000000" }}>
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{ background: "#000000" }}
+    >
       <WelcomePopup />
-      <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="w-full max-w-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-sm"
+      >
+        {/* Language switcher */}
         <div className="flex justify-end mb-4">
           <div className="flex items-center gap-1 rounded-xl p-1" style={{ background: "#111", border: "1px solid #222" }}>
             <Globe size={13} style={{ color: "#555" }} className="ml-1" />
@@ -90,7 +94,9 @@ export default function Login() {
                 key={l}
                 onClick={() => setLang(l)}
                 className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all${lang === l ? " btn-on-white" : ""}`}
-                style={lang === l ? { background: "#ffffff", color: "#000000" } : { background: "transparent", color: "#666" }}
+                style={lang === l
+                  ? { background: "#ffffff", color: "#000000" }
+                  : { background: "transparent", color: "#666" }}
               >
                 {l}
               </button>
@@ -98,43 +104,215 @@ export default function Login() {
           </div>
         </div>
 
+        {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div style={{ borderRadius: "22px", padding: "4px", background: "linear-gradient(145deg, rgba(0,180,255,0.25), rgba(0,80,160,0.1))", boxShadow: "0 0 28px rgba(0,180,255,0.55), 0 0 60px rgba(0,120,220,0.3), 0 8px 24px rgba(0,0,0,0.7)", transform: "perspective(400px) rotateX(4deg)" }}>
-              <img src="/logo.png" alt="HEAVENx Logo" className="h-28 w-28 object-contain" style={{ borderRadius: "18px", display: "block", filter: "drop-shadow(0 0 8px rgba(0,180,255,0.3))" }} />
+            <div
+              style={{
+                borderRadius: "22px",
+                padding: "4px",
+                background: "linear-gradient(145deg, rgba(0,180,255,0.25), rgba(0,80,160,0.1))",
+                boxShadow: "0 0 28px rgba(0,180,255,0.55), 0 0 60px rgba(0,120,220,0.3), 0 8px 24px rgba(0,0,0,0.7)",
+                transform: "perspective(400px) rotateX(4deg)",
+              }}
+            >
+              <img
+                src="/logo.png"
+                alt="HEAVENx Logo"
+                className="h-28 w-28 object-contain"
+                style={{
+                  borderRadius: "18px",
+                  display: "block",
+                  filter: "drop-shadow(0 0 8px rgba(0,180,255,0.3))",
+                }}
+              />
             </div>
           </div>
-          <h1 dir="rtl" style={{ fontFamily: "'Reem Kufi', sans-serif", fontSize: "2.2rem", lineHeight: "1.5", color: "#60cfff", fontWeight: 700, letterSpacing: "0.01em", textShadow: "0 0 12px rgba(0,180,255,0.85), 0 0 28px rgba(0,140,220,0.5)" }}>
+          <h1
+            dir="rtl"
+            style={{
+              fontFamily: "'Reem Kufi', sans-serif",
+              fontSize: "2.2rem",
+              lineHeight: "1.5",
+              color: "#60cfff",
+              fontWeight: 700,
+              letterSpacing: "0.01em",
+              textShadow: "0 0 12px rgba(0,180,255,0.85), 0 0 28px rgba(0,140,220,0.5)",
+            }}
+          >
             بهشت منهوا
           </h1>
         </div>
 
-        <div className="rounded-2xl p-7" style={{ background: "#0f0f0f", border: "1px solid #1a3a55", boxShadow: "0 0 40px rgba(0,136,204,0.18), 0 0 80px rgba(0,100,180,0.10), inset 0 0 30px rgba(0,80,160,0.06)" }}>
-          <h2 className="mb-1 text-center" style={{ fontWeight: 700, fontSize: "1.2rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>{t("login")}</h2>
+        {/* Card */}
+        <div
+          className="rounded-2xl p-7"
+          style={{ background: "#0f0f0f", border: "1px solid #1a3a55", boxShadow: "0 0 40px rgba(0,136,204,0.18), 0 0 80px rgba(0,100,180,0.10), inset 0 0 30px rgba(0,80,160,0.06)" }}
+        >
+          <h2 className="mb-1 text-center" style={{ fontWeight: 700, fontSize: "1.2rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
+            {t("login")}
+          </h2>
           <div className="mb-5 mx-auto rounded-full" style={{ height: "2px", width: "80px", background: "linear-gradient(90deg, rgba(0,180,255,0.1), #60cfff, rgba(0,180,255,0.1))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Username */}
             <div>
-              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>{t("username")}</label>
+              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
+                {t("username")}
+              </label>
+              <div className="mb-2 rounded-full" style={{ height: "2px", background: "linear-gradient(90deg, #60cfff, rgba(0,180,255,0.15))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
               <div className="relative">
                 <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl focus:outline-none" style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)" }} />
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
+                  style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
+                  autoComplete="username"
+                  autoFocus
+                />
               </div>
             </div>
+
+            {/* Password */}
             <div>
-              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>{t("password")}</label>
+              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
+                {t("password")}
+              </label>
+              <div className="mb-2 rounded-full" style={{ height: "2px", background: "linear-gradient(90deg, #60cfff, rgba(0,180,255,0.15))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
               <div className="relative">
                 <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
-                <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full pl-9 pr-10 py-2.5 text-sm rounded-xl focus:outline-none" style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)" }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }}>{showPassword ? <EyeOff size={15} /> : <Eye size={15} />}</button>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-9 pr-10 py-2.5 text-sm rounded-xl focus:outline-none transition-all"
+                  style={{ background: "rgba(255,255,255,0.06)", color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "#555" }}
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </div>
-            {error && <div className="p-3 rounded-xl text-sm" style={{ background: "#1a0808", border: "1px solid #2a1010", color: "#ff6b6b" }} dir={isRTL(error) ? "rtl" : "ltr"}>{error}</div>}
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl transition-all" style={{ fontWeight: 700, background: "rgba(255,255,255,0.12)", color: "#ffffff", border: "1px solid rgba(255,255,255,0.25)" }}>
-              {loading ? t("loading") : t("loginBtn")}
+
+            {/* Error */}
+            {error && (
+              <div
+                className="p-3 rounded-xl text-sm"
+                style={{ background: "#1a0808", border: "1px solid #2a1010", color: "#ff6b6b" }}
+                dir={isRTL(error) ? "rtl" : "ltr"}
+              >
+                {error}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-xl disabled:opacity-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                fontSize: "1rem",
+                letterSpacing: "0.06em",
+                textShadow: "0 1px 8px rgba(255,255,255,0.3)",
+                background: "rgba(255,255,255,0.12)",
+                color: "#ffffff",
+                border: "1px solid rgba(255,255,255,0.25)",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 4px 20px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  {t("loading")}
+                </span>
+              ) : (
+                t("loginBtn")
+              )}
             </button>
           </form>
+
+          {/* Social links */}
+          {socialLinks.length > 0 && (
+            <div className="mt-5 pt-5" style={{ borderTop: "1px solid #1e1e1e" }}>
+              <p
+                className="text-center mb-3"
+                style={{ color: "#666", fontFamily: "'Lalezar', cursive", fontSize: "0.95rem" }}
+              >
+                مارو دنبال کن
+              </p>
+              <div className="flex flex-col gap-2">
+                {socialLinks.map((link) => {
+                  const isTelegram = link.platform === "telegram";
+                  const colors = PLATFORM_COLORS[link.platform] || { bg: "#1a1a1a", hover: "#2a2a2a" };
+                  return isTelegram ? (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-3 w-full py-3 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        background: "rgba(0, 136, 204, 0.15)",
+                        border: "1px solid rgba(0, 136, 204, 0.4)",
+                        backdropFilter: "blur(12px)",
+                        boxShadow: "0 4px 20px rgba(0,136,204,0.15), inset 0 1px 0 rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <TelegramIcon />
+                      <span
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          letterSpacing: "0.06em",
+                          color: "#ffffff",
+                          textShadow: "0 1px 8px rgba(0,136,204,0.6)",
+                        }}
+                      >
+                        {link.label || "Telegram"}
+                      </span>
+                    </a>
+                  ) : (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium text-white transition-all"
+                      style={{ background: colors.bg }}
+                    >
+                      <span className="text-base">{PLATFORM_ICONS[link.platform] || "🔗"}</span>
+                      {link.label || link.platform}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
+
+        <p
+          className="text-center mt-3 leading-5"
+          dir="rtl"
+          style={{ color: "#444", fontFamily: "'Lalezar', cursive", fontSize: "0.82rem" }}
+        >
+          بهشت منهوا آرشیو بزرگ منهوا ساخت سایت در سال 2026
+          <br />
+          برای هر مشکلی لطفاً به آدمین در تلگرام اطلاع بدهید
+        </p>
       </motion.div>
     </div>
   );
