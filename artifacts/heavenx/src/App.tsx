@@ -1,5 +1,6 @@
-
 import { Switch, Route, Router as WouterRouter } from "wouter";
+// 1. Hier das Hook importieren
+import { useHashLocation } from "wouter/use-hash-location";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -71,17 +72,10 @@ function ProtectedRoutes() {
 function AppRoutes() {
   return (
     <Switch>
-      {/* Login — always accessible */}
       <Route path="/login" component={Login} />
-
-      {/* Admin routes — no Navbar */}
       <Route path="/admin" component={AdminRoutes} />
       <Route path="/admin/:rest*" component={AdminRoutes} />
-
-      {/* Reader — no Navbar */}
       <Route path="/reader/:id" component={Reader} />
-
-      {/* All other routes */}
       <Route component={ProtectedRoutes} />
     </Switch>
   );
@@ -92,7 +86,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LangProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          {/* 2. Hier den Hook zuweisen */}
+          <WouterRouter hook={useHashLocation}>
             <AppRoutes />
           </WouterRouter>
           <Toaster />
