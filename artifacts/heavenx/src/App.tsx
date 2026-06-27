@@ -2,7 +2,7 @@ import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { LangProvider } from "@/contexts/LangContext";
 import Navbar from "@/components/Navbar";
 import NotFound from "@/pages/not-found";
@@ -54,20 +54,6 @@ function AdminRoutes() {
 }
 
 function ProtectedRoutes() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Redirect to="/login" />;
-  }
-
   return (
     <>
       <Navbar />
@@ -83,26 +69,19 @@ function ProtectedRoutes() {
 }
 
 function AppRoutes() {
-  const { user, loading } = useAuth();
-
   return (
     <Switch>
-      {/* Login — always accessible, redirect to home if already logged in */}
-      <Route path="/login">
-        {() => {
-          if (!loading && user) return <Redirect to="/" />;
-          return <Login />;
-        }}
-      </Route>
+      {/* Login — always accessible */}
+      <Route path="/login" component={Login} />
 
       {/* Admin routes — no Navbar */}
       <Route path="/admin" component={AdminRoutes} />
       <Route path="/admin/:rest*" component={AdminRoutes} />
 
-      {/* Reader — no Navbar, auth checked inside */}
+      {/* Reader — no Navbar */}
       <Route path="/reader/:id" component={Reader} />
 
-      {/* All other routes require auth */}
+      {/* All other routes */}
       <Route component={ProtectedRoutes} />
     </Switch>
   );
