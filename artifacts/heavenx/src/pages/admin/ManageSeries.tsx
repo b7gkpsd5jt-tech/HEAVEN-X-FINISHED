@@ -2,41 +2,26 @@ import { useEffect, useState, useRef } from "react";
 import { apiFetch, apiUpload, API_BASE } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
 import { motion } from "framer-motion";
-import { Plus, Edit, Trash2, Upload, X, Search, BookOpen, Image, Type } from "lucide-react";
+import { Plus, Edit, Trash2, Upload, X, Search, BookOpen, Image } from "lucide-react";
 import { Link } from "wouter";
 
 interface Series {
   id: string; title: string; altTitle?: string; description?: string;
   cover?: string; author?: string; artist?: string; status: string;
-  titleFont?: string; views: number;
+  views: number;
   genres?: { genre: { name: string } }[];
   _count?: { chapters: number };
 }
 
 interface Form {
   title: string; altTitle: string; description: string;
-  author: string; artist: string; status: string;
-  genres: string; titleFont: string; authorFont: string; descriptionFont: string;
+  author: string; artist: string; status: string; genres: string;
 }
 
 const EMPTY_FORM: Form = {
   title: "", altTitle: "", description: "",
-  author: "", artist: "", status: "ONGOING",
-  genres: "", titleFont: "", authorFont: "", descriptionFont: "",
+  author: "", artist: "", status: "ONGOING", genres: "",
 };
-
-const FA_FONTS = [
-  { label: "پیش‌فرض (بدون فونت)", value: "" },
-  { label: "Vazirmatn", value: "Vazirmatn" },
-  { label: "Lalezar", value: "Lalezar" },
-  { label: "Reem Kufi", value: "Reem Kufi" },
-  { label: "Markazi Text", value: "Markazi Text" },
-  { label: "Noto Nastaliq Urdu", value: "Noto Nastaliq Urdu" },
-  { label: "Amiri", value: "Amiri" },
-  { label: "Scheherazade New", value: "Scheherazade New" },
-  { label: "Inter (لاتین)", value: "Inter" },
-  { label: "Exo 2 (لاتین)", value: "Exo 2" },
-];
 
 const D = {
   bg: "#0a0a0a",
@@ -60,6 +45,12 @@ const inputCls = {
   width: "100%",
   outline: "none",
 };
+
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <label style={{ fontSize: 12, fontWeight: 600, color: D.muted, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+    {children}
+  </label>
+);
 
 export default function ManageSeries() {
   const { t } = useLang();
@@ -105,12 +96,11 @@ export default function ManageSeries() {
       artist: s.artist || "",
       status: s.status,
       genres: s.genres?.map(g => g.genre.name).join(", ") || "",
-      titleFont: s.titleFont || "",
-      authorFont: (s as any).authorFont || "",
-      descriptionFont: (s as any).descriptionFont || "",
     });
     setCoverFile(null);
-    const cv = s.cover ? (s.cover.startsWith("/uploads") ? `${API_BASE.replace("/api", "")}${s.cover}` : s.cover) : "";
+    const cv = s.cover
+      ? (s.cover.startsWith("/uploads") ? `${API_BASE.replace("/api", "")}${s.cover}` : s.cover)
+      : "";
     setCoverPreview(cv);
     setError("");
     setShowModal(true);
@@ -126,6 +116,7 @@ export default function ManageSeries() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) { setError("عنوان الزامی است"); return; }
+    if (!confirm(editing ? t("areYouSure") : "این Manhwa اضافه شود؟")) return;
     setSaving(true);
     setError("");
     try {
@@ -137,9 +128,6 @@ export default function ManageSeries() {
         artist: form.artist.trim() || undefined,
         status: form.status,
         genres: form.genres ? form.genres.split(",").map(g => g.trim()).filter(Boolean) : [],
-        titleFont: form.titleFont || null,
-        authorFont: form.authorFont || null,
-        descriptionFont: form.descriptionFont || null,
       };
 
       let saved: Series;
@@ -189,12 +177,6 @@ export default function ManageSeries() {
     s.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const Label = ({ children }: { children: React.ReactNode }) => (
-    <label style={{ fontSize: 12, fontWeight: 600, color: D.muted, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-      {children}
-    </label>
-  );
-
   return (
     <div className="p-6" style={{ minHeight: "100vh" }}>
       {/* Header */}
@@ -241,24 +223,22 @@ export default function ManageSeries() {
                 key={s.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="rounded-2xl p-4 flex gap-3 transition-colors"
+                className="rounded-2xl p-4 flex gap-3"
                 style={{ background: D.card, border: `1px solid ${D.border}` }}
               >
+                {/* Cover */}
                 <div
                   className="w-14 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
-                  style={{ height: 72, background: D.input, boxShadow: "0 0 12px rgba(0,180,255,0.25)" }}
+                  style={{ height: 72, background: D.input, boxShadow: "0 0 12px rgba(0,180,255,0.2)" }}
                 >
                   {coverUrl
                     ? <img src={coverUrl} alt={s.title} className="w-full h-full object-cover" />
                     : <BookOpen size={18} style={{ color: D.muted }} />}
                 </div>
+
+                {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3
-                    className="font-semibold text-sm truncate"
-                    style={{ color: D.text, fontFamily: s.titleFont || undefined }}
-                  >
-                    {s.title}
-                  </h3>
+                  <h3 className="font-semibold text-sm truncate" style={{ color: D.text }}>{s.title}</h3>
                   {s.altTitle && <p className="text-xs truncate" style={{ color: D.muted }}>{s.altTitle}</p>}
                   <div className="flex items-center gap-2 mt-1 text-xs" style={{ color: D.muted }}>
                     <span>{s._count?.chapters || 0} ch</span>
@@ -267,7 +247,7 @@ export default function ManageSeries() {
                       {s.status}
                     </span>
                   </div>
-                  <div className="flex gap-2 mt-3 flex-wrap">
+                  <div className="flex gap-2 mt-3 items-center">
                     <Link href={`/admin/chapters?seriesId=${s.id}`}>
                       <button
                         className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg transition-all"
@@ -283,13 +263,16 @@ export default function ManageSeries() {
                     >
                       <Edit size={11} /> {t("edit")}
                     </button>
+                    {/* Delete — same pattern as ManageChapters */}
                     <button
                       onClick={() => handleDelete(s.id)}
                       disabled={deleting === s.id}
-                      className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg transition-all disabled:opacity-50"
-                      style={{ background: "rgba(239,68,68,0.12)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)" }}
+                      className="p-2 rounded-lg transition-all disabled:opacity-50 ml-auto"
+                      style={{ color: "#555" }}
+                      onMouseEnter={e => (e.currentTarget.style.color = "#ff6b6b")}
+                      onMouseLeave={e => (e.currentTarget.style.color = "#555")}
                     >
-                      <Trash2 size={11} /> {t("delete")}
+                      <Trash2 size={15} />
                     </button>
                   </div>
                 </div>
@@ -315,7 +298,6 @@ export default function ManageSeries() {
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0 }}
             className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl overflow-hidden"
             style={{ background: D.panel, border: `1px solid ${D.border}`, maxHeight: "92vh", overflowY: "auto" }}
           >
@@ -327,17 +309,12 @@ export default function ManageSeries() {
               <h2 className="font-bold text-base" style={{ color: D.text }}>
                 {editing ? `✏️ ${t("edit")}` : `➕ ${t("addSeries")}`}
               </h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-1.5 rounded-lg transition-colors"
-                style={{ color: D.muted }}
-              >
+              <button onClick={() => setShowModal(false)} style={{ color: D.muted }}>
                 <X size={18} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-5">
-              {/* Error */}
               {error && (
                 <div className="px-3 py-2 rounded-xl text-sm" style={{ background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)" }}>
                   {error}
@@ -383,7 +360,7 @@ export default function ManageSeries() {
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   placeholder="عنوان Manhwa..."
-                  style={{ ...inputCls, fontFamily: form.titleFont || undefined }}
+                  style={inputCls}
                 />
               </div>
 
@@ -397,14 +374,14 @@ export default function ManageSeries() {
                 />
               </div>
 
-              {/* Author + Artist */}
+              {/* Translator Team + Artist */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>{t("author")}</Label>
                   <input
                     value={form.author}
                     onChange={e => setForm(f => ({ ...f, author: e.target.value }))}
-                    style={{ ...inputCls, fontFamily: form.authorFont || undefined }}
+                    style={inputCls}
                   />
                 </div>
                 <div>
@@ -415,32 +392,6 @@ export default function ManageSeries() {
                     style={inputCls}
                   />
                 </div>
-              </div>
-
-              {/* Author Font */}
-              <div>
-                <Label>
-                  <span className="flex items-center gap-1.5">
-                    <Type size={11} style={{ display: "inline" }} />
-                    فونت منبع / تیم ترجمه
-                  </span>
-                </Label>
-                <select
-                  value={form.authorFont}
-                  onChange={e => setForm(f => ({ ...f, authorFont: e.target.value }))}
-                  style={{ ...inputCls, cursor: "pointer", fontFamily: form.authorFont || undefined }}
-                >
-                  {FA_FONTS.map(f => (
-                    <option key={f.value} value={f.value} style={{ background: D.panel, fontFamily: f.value || undefined }}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-                {form.authorFont && form.author && (
-                  <p className="mt-2 text-sm px-3 py-1.5 rounded-lg" style={{ background: D.input, color: D.text, fontFamily: form.authorFont, border: `1px solid ${D.border}` }}>
-                    {form.author}
-                  </p>
-                )}
               </div>
 
               {/* Status */}
@@ -470,35 +421,6 @@ export default function ManageSeries() {
                 />
               </div>
 
-              {/* Title Font */}
-              <div>
-                <Label>
-                  <span className="flex items-center gap-1.5">
-                    <Type size={11} style={{ display: "inline" }} />
-                    فونت عنوان (اختیاری)
-                  </span>
-                </Label>
-                <select
-                  value={form.titleFont}
-                  onChange={e => setForm(f => ({ ...f, titleFont: e.target.value }))}
-                  style={{ ...inputCls, cursor: "pointer", fontFamily: form.titleFont || undefined }}
-                >
-                  {FA_FONTS.map(f => (
-                    <option key={f.value} value={f.value} style={{ background: D.panel, fontFamily: f.value || undefined }}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-                {form.titleFont && (
-                  <p
-                    className="mt-2 text-sm px-3 py-1.5 rounded-lg"
-                    style={{ background: D.input, color: D.text, fontFamily: form.titleFont, border: `1px solid ${D.border}` }}
-                  >
-                    {form.title || "پیش‌نمایش عنوان"}
-                  </p>
-                )}
-              </div>
-
               {/* Description */}
               <div>
                 <Label>{t("description")}</Label>
@@ -506,34 +428,8 @@ export default function ManageSeries() {
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={4}
-                  style={{ ...inputCls, resize: "none", lineHeight: 1.6, fontFamily: form.descriptionFont || undefined }}
+                  style={{ ...inputCls, resize: "none", lineHeight: 1.6 }}
                 />
-              </div>
-
-              {/* Description Font */}
-              <div>
-                <Label>
-                  <span className="flex items-center gap-1.5">
-                    <Type size={11} style={{ display: "inline" }} />
-                    فونت توضیحات (Description Font)
-                  </span>
-                </Label>
-                <select
-                  value={form.descriptionFont}
-                  onChange={e => setForm(f => ({ ...f, descriptionFont: e.target.value }))}
-                  style={{ ...inputCls, cursor: "pointer", fontFamily: form.descriptionFont || undefined }}
-                >
-                  {FA_FONTS.map(f => (
-                    <option key={f.value} value={f.value} style={{ background: D.panel, fontFamily: f.value || undefined }}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
-                {form.descriptionFont && form.description && (
-                  <p className="mt-2 text-sm px-3 py-1.5 rounded-lg" style={{ background: D.input, color: D.text, fontFamily: form.descriptionFont, border: `1px solid ${D.border}`, lineHeight: 1.7, direction: "rtl" }}>
-                    {form.description.slice(0, 100)}{form.description.length > 100 ? "…" : ""}
-                  </p>
-                )}
               </div>
 
               {/* Actions */}
