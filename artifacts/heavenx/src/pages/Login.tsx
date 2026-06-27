@@ -10,7 +10,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // ورود اضطراری برای دسترسی سریع
+    // ورود برای دسترسی ادمین
     if (username === "admin" && password === "Hamid4747") {
       localStorage.setItem("user", JSON.stringify({ role: "ADMIN", name: "Admin" }));
       window.location.hash = "/admin";
@@ -28,6 +28,8 @@ export default function Login() {
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
         window.location.hash = "/admin";
+      } else {
+        throw new Error();
       }
     } catch (err) {
       alert("نام کاربری یا رمز عبور اشتباه است.");
@@ -39,12 +41,14 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a] text-white">
       <form onSubmit={handleLogin} className="bg-[#111] p-8 rounded-2xl w-full max-w-sm border border-[#222]">
-        {/* لوگو و نوشته آبی رنگ */}
+        {/* لوگو و نوشته آبی با همان استایل پنل */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-full mb-4 flex items-center justify-center text-white font-bold text-xl">
-            HX
+          <div className="text-blue-600 mb-2">
+            {/* اینجا می‌تونی تگ img برای لوگوی خودت قرار بدی */}
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
-          <h1 className="text-4xl font-bold text-blue-600">Heaven-X</h1>
+          <h1 className="text-4xl font-bold text-blue-600 tracking-tight">Heaven-X</h1>
+          <p className="text-blue-600 font-bold mt-1">بهشت من هوا</p>
         </div>
         
         <input 
