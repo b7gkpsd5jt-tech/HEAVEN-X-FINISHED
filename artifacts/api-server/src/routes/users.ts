@@ -27,6 +27,58 @@ router.get("/", authenticate, requireAdmin, async (_req: AuthRequest, res: Respo
   }
 });
 
+// Bulk create users — batched bcrypt + chunked DB insert
+router.post("/bulk", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const { users } = req.body as { users: Array<{ username: string; password: string }> };
+    if (!Array.isArray(users) || users.length === 0) {
+      res.status(400).json({ error: "users array required" }); return;
+    }
+    if (users.length > 50000) {
+      res.status(400).json({ error: "Max 50,000 per request" }); return;
+    }
+
+    let created = 0;
+    let skipped = 0;
+    const errors: string[] = [];
+
+    // Hash passwords in parallel batches of 40 (bcrypt cost 10 for speed)
+    const HASH_BATCH = 40;
+    const DB_CHUNK = 500;
+    const hashed: Array<{ username: string; passwordHash: string }> = [];
+
+    for (let i = 0; i < users.length; i += HASH_BATCH) {
+      const batch = users.slice(i, i + HASH_BATCH);
+      const results = await Promise.all(
+        batch.map(async u => ({
+          username: u.username.toLowerCase().trim(),
+          passwordHash: await bcrypt.hash(u.password, 10),
+        }))
+      );
+      hashed.push(...results);
+    }
+
+    // Insert in chunks of 500
+    for (let i = 0; i < hashed.length; i += DB_CHUNK) {
+      const chunk = hashed.slice(i, i + DB_CHUNK);
+      try {
+        const rows = await db.insert(usersTable).values(
+          chunk.map(u => ({ username: u.username, password: u.passwordHash, role: "USER", language: "DE" }))
+        ).onConflictDoNothing().returning({ id: usersTable.id });
+        created += rows.length;
+        skipped += chunk.length - rows.length;
+      } catch (err: any) {
+        errors.push(`Chunk ${i}–${i + chunk.length}: ${err.message}`);
+      }
+    }
+
+    res.json({ total: users.length, created, skipped, errors });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const { username, password, email, role, language } = req.body;
