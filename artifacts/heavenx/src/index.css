@@ -204,17 +204,6 @@ input, textarea, select {
 }
 input::placeholder, textarea::placeholder { color: #555555; }
 
-/* ==================== GLOBAL BLUE TEXT ==================== */
-body * {
-  color: #60cfff !important;
-}
-
-/* Exceptions — white-bg buttons: black text */
-.btn-on-white,
-.btn-on-white * {
-  color: #000000 !important;
-}
-
 /* Exception — logout: red */
 .btn-logout,
 .btn-logout * {
