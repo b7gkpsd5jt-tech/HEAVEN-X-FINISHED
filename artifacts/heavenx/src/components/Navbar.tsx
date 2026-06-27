@@ -49,7 +49,7 @@ export default function Navbar() {
               <span
                 dir="rtl"
                 style={{
-                  fontFamily: "'Noto Nastaliq Urdu', serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontWeight: 700,
                   fontSize: "1.15rem",
                   color: "#ffffff",
