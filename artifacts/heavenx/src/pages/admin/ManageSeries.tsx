@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { apiFetch, apiUpload, API_BASE } from "@/lib/api";
+import { apiFetch, apiUpload, getImageUrl } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
 import { motion } from "framer-motion";
 import { Plus, Edit, Trash2, Upload, X, Search, BookOpen, Image } from "lucide-react";
@@ -98,10 +98,7 @@ export default function ManageSeries() {
       genres: s.genres?.map(g => g.genre.name).join(", ") || "",
     });
     setCoverFile(null);
-    const cv = s.cover
-      ? (s.cover.startsWith("/uploads") ? `${API_BASE.replace("/api", "")}${s.cover}` : s.cover)
-      : "";
-    setCoverPreview(cv);
+    setCoverPreview(getImageUrl(s.cover) || "");
     setError("");
     setShowModal(true);
   };
@@ -215,9 +212,7 @@ export default function ManageSeries() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(s => {
-            const coverUrl = s.cover
-              ? (s.cover.startsWith("/uploads") ? `${API_BASE.replace("/api", "")}${s.cover}` : s.cover)
-              : null;
+            const coverUrl = getImageUrl(s.cover);
             return (
               <motion.div
                 key={s.id}
