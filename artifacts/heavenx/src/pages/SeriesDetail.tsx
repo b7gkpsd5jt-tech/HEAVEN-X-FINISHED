@@ -5,6 +5,7 @@ import { useLang } from "@/contexts/LangContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Eye, BookOpen, Heart, HeartOff, Star, ChevronDown, ChevronUp } from "lucide-react";
+import SafeImage from "@/components/SafeImage";
 
 interface Genre { genre: { id: string; name: string } }
 interface Chapter { id: string; number: number; title?: string; views: number; uploadDate: string }
@@ -74,7 +75,14 @@ export default function SeriesDetail() {
     <div className="min-h-screen bg-gray-50">
       {/* Banner */}
       <div className="relative h-48 md:h-64 overflow-hidden bg-gradient-to-br from-indigo-900 to-violet-900">
-        {coverUrl && <img src={coverUrl} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25 scale-105 blur-sm" />}
+        {coverUrl && (
+          <SafeImage
+            src={coverUrl}
+            alt=""
+            variant="banner"
+            className="absolute inset-0 w-full h-full object-cover opacity-25 scale-105 blur-sm"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
       </div>
 
@@ -86,13 +94,12 @@ export default function SeriesDetail() {
               className="w-36 h-48 sm:w-44 sm:h-60 rounded-xl overflow-hidden"
               style={{ boxShadow: "0 0 24px rgba(0,180,255,0.5), 0 0 50px rgba(0,120,220,0.25), 0 8px 24px rgba(0,0,0,0.6)" }}
             >
-              {coverUrl ? (
-                <img src={coverUrl} alt={series.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a1a2a, #111)" }}>
-                  <BookOpen size={32} style={{ color: "#60cfff" }} />
-                </div>
-              )}
+              <SafeImage
+                src={coverUrl}
+                alt={series.title}
+                variant="cover"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
 

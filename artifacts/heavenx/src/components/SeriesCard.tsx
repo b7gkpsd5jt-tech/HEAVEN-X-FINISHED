@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Eye, BookOpen } from "lucide-react";
 import { useLang } from "@/contexts/LangContext";
 import { getImageUrl } from "@/lib/api";
+import SafeImage from "@/components/SafeImage";
 
 interface Series {
   id: string;
@@ -45,21 +46,13 @@ export default function SeriesCard({ series }: Props) {
             boxShadow: "0 0 18px rgba(0,180,255,0.35), 0 0 40px rgba(0,120,220,0.18)",
           }}
         >
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt={series.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-violet-100">
-              <BookOpen size={36} className="text-indigo-300" />
-            </div>
-          )}
+          <SafeImage
+            src={coverUrl}
+            alt={series.title}
+            variant="cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
 
           {/* Overlay on hover */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
