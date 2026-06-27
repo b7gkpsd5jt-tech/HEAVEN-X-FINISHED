@@ -1,27 +1,22 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { useLang } from "@/contexts/LangContext";
-import { useAuth } from "@/contexts/AuthContext";
 import SeriesCard from "@/components/SeriesCard";
-import { useLocation } from "wouter";
 import { Heart } from "lucide-react";
 
 interface Series { id: string; title: string; cover?: string; status?: string; views?: number; genres?: any[]; _count?: { chapters: number } }
 
 export default function Favorites() {
   const { t } = useLang();
-  const { user } = useAuth();
-  const [, navigate] = useLocation();
   const [series, setSeries] = useState<Series[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { navigate("/login"); return; }
     apiFetch<Series[]>("/users/favorites")
       .then(setSeries)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user, navigate]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
