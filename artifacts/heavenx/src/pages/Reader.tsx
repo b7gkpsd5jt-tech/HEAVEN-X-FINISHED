@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Settings, Moon, Sun, ZoomIn, ZoomOut,
-  List, X, Star, MessageSquare, Send, RotateCcw, Contrast
+  List, X, Star, MessageSquare, Send, RotateCcw, Contrast, ImageOff
 } from "lucide-react";
 
 interface Page { id: string; pageNumber: number; filePath: string; fileName: string; order: number }
@@ -51,6 +51,49 @@ const DARK = {
   hover: "#1a1a1a",
   accent: "#60cfff",
 };
+
+function PageImage({ src, idx, zoom, filter, onVisible, horizontal }: {
+  src: string | null; idx: number; zoom: number; filter: string;
+  onVisible?: () => void; horizontal?: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return (
+    <div
+      style={{
+        width: horizontal ? "auto" : `${zoom}%`,
+        maxWidth: 900,
+        margin: "0 auto",
+        padding: "40px 0",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 8,
+        color: "#333",
+      }}
+    >
+      <ImageOff size={28} />
+      <span style={{ fontSize: 11 }}>صفحه {idx + 1} در دسترس نیست</span>
+    </div>
+  );
+  return (
+    <img
+      src={src || ""}
+      alt=""
+      loading="lazy"
+      onLoad={onVisible}
+      onError={() => setFailed(true)}
+      style={{
+        width: horizontal ? `${zoom}%` : `${zoom}%`,
+        maxWidth: horizontal ? "100%" : "900px",
+        maxHeight: horizontal ? "100%" : undefined,
+        filter,
+        display: "block",
+        margin: horizontal ? undefined : "0 auto",
+        objectFit: "contain",
+      }}
+    />
+  );
+}
 
 export default function Reader() {
   const { id } = useParams();
@@ -389,14 +432,13 @@ export default function Reader() {
         {settings.readMode === "vertical" ? (
           <div className="flex flex-col items-center gap-0.5">
             {chapter.pages.map((page, idx) => (
-              <img
+              <PageImage
                 key={page.id}
-                src={getImageUrl(page.filePath) || ""}
-                alt=""
-                loading="lazy"
-                onLoad={() => { if (idx + 1 > currentPage) setCurrentPage(idx + 1); }}
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                style={{ width: `${settings.zoom}%`, maxWidth: "900px", filter: filterStyle, display: "block", margin: "0 auto" }}
+                src={getImageUrl(page.filePath)}
+                idx={idx}
+                zoom={settings.zoom}
+                filter={filterStyle}
+                onVisible={() => { if (idx + 1 > currentPage) setCurrentPage(idx + 1); }}
               />
             ))}
           </div>
@@ -404,12 +446,12 @@ export default function Reader() {
           <div className="max-w-3xl mx-auto px-4 h-[calc(100vh-120px)] flex flex-col">
             {chapter.pages[currentHPage] && (
               <div className="flex-1 flex items-center justify-center overflow-hidden">
-                <img
-                  src={getImageUrl(chapter.pages[currentHPage].filePath) || ""}
-                  alt=""
-                  style={{ maxHeight: "100%", maxWidth: "100%", filter: filterStyle, width: `${settings.zoom}%` }}
-                  className="object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                <PageImage
+                  src={getImageUrl(chapter.pages[currentHPage].filePath)}
+                  idx={currentHPage}
+                  zoom={settings.zoom}
+                  filter={filterStyle}
+                  horizontal
                 />
               </div>
             )}

@@ -51,10 +51,11 @@ export default function Navbar() {
                 }}
               >
                 <img
-                  src="/logo.png"
+                  src={`${import.meta.env.BASE_URL}logo.png`}
                   alt="HEAVENx"
                   className="h-10 w-10 object-contain"
                   style={{ borderRadius: "11px", display: "block" }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
               <span
