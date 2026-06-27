@@ -2,8 +2,8 @@ services:
   - type: web
     name: heavenx-api
     runtime: node
-    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && cd artifacts/api-server && pnpm run build
-    startCommand: node artifacts/api-server/dist/index.js
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && cd artifacts/api-server && node build.mjs
+    startCommand: node artifacts/api-server/dist/index.mjs
     plan: free
     envVars:
       - key: NODE_ENV
