@@ -40,20 +40,31 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer select-none">
-              <img
-                src="/logo.png"
-                alt="HEAVENx"
-                className="h-10 w-10 object-contain"
-                style={{ filter: "drop-shadow(0 0 6px rgba(100,160,255,0.35))" }}
-              />
+              <div
+                style={{
+                  borderRadius: "14px",
+                  padding: "3px",
+                  background: "linear-gradient(145deg, rgba(0,180,255,0.25), rgba(0,80,160,0.1))",
+                  boxShadow: "0 0 18px rgba(0,180,255,0.55), 0 0 40px rgba(0,120,220,0.25), 0 4px 14px rgba(0,0,0,0.7)",
+                  transform: "perspective(400px) rotateX(4deg)",
+                  flexShrink: 0,
+                }}
+              >
+                <img
+                  src="/logo.png"
+                  alt="HEAVENx"
+                  className="h-10 w-10 object-contain"
+                  style={{ borderRadius: "11px", display: "block" }}
+                />
+              </div>
               <span
                 dir="rtl"
                 style={{
                   fontFamily: "'Reem Kufi', sans-serif",
                   fontWeight: 700,
                   fontSize: "1.15rem",
-                  color: "#ffffff",
-                  textShadow: "0 0 8px rgba(0,180,255,0.9), 0 0 18px rgba(0,140,220,0.6)",
+                  color: "#60cfff",
+                  textShadow: "0 0 10px rgba(0,180,255,0.85), 0 0 22px rgba(0,140,220,0.5)",
                 }}
               >
                 بهشت منهوا
