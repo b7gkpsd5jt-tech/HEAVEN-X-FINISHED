@@ -240,7 +240,7 @@ export default function Login() {
             <div className="mt-5 pt-5" style={{ borderTop: "1px solid #1e1e1e" }}>
               <p
                 className="text-center mb-3"
-                style={{ color: "#666", fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: "0.78rem", letterSpacing: "0.04em" }}
+                style={{ color: "#666", fontFamily: "'Lalezar', cursive", fontSize: "0.95rem" }}
               >
                 مارو دنبال کن
               </p>
@@ -298,7 +298,7 @@ export default function Login() {
         <p
           className="text-center mt-3 leading-5"
           dir="rtl"
-          style={{ color: "#444", fontFamily: "Inter, sans-serif", fontSize: "0.68rem" }}
+          style={{ color: "#444", fontFamily: "'Lalezar', cursive", fontSize: "0.82rem" }}
         >
           بهشت منهوا آرشیو بزرگ منهوا ساخت سایت در سال 2026
           <br />
