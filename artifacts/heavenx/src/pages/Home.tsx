@@ -149,7 +149,7 @@ export default function Home() {
           >
             <Link href="/library">
               <button
-                className="px-6 py-2.5 font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5"
+                className="btn-on-white px-6 py-2.5 font-semibold text-sm rounded-xl transition-all hover:-translate-y-0.5"
                 style={{
                   background: "#ffffff",
                   color: "#000000",

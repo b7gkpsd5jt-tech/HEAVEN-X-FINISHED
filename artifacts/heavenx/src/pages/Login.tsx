@@ -93,7 +93,7 @@ export default function Login() {
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className="px-2.5 py-1 text-xs font-bold rounded-lg transition-all"
+                className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all${lang === l ? " btn-on-white" : ""}`}
                 style={lang === l
                   ? { background: "#ffffff", color: "#000000" }
                   : { background: "transparent", color: "#666" }}
