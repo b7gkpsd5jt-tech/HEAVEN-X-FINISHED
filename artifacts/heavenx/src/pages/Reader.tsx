@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Settings, Moon, Sun, ZoomIn, ZoomOut,
-  List, X, Star, MessageSquare, Send, RotateCcw, Contrast, ImageOff
+  List, X, Star, Send, RotateCcw, Contrast, ImageOff
 } from "lucide-react";
 
 interface Page { id: string; pageNumber: number; filePath: string; fileName: string; order: number }
@@ -104,7 +104,6 @@ export default function Reader() {
   const [settings, setSettings] = useState<ReaderSettings>(loadSettings);
   const [showSettings, setShowSettings] = useState(false);
   const [showChapterList, setShowChapterList] = useState(false);
-  const [showComments, setShowComments] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentHPage, setCurrentHPage] = useState(0);
@@ -244,25 +243,18 @@ export default function Reader() {
 
               <div className="flex items-center gap-0.5">
                 {[
-                  { icon: <List size={17} />, action: () => setShowChapterList(!showChapterList), badge: null },
-                  { icon: <MessageSquare size={17} />, action: () => setShowComments(!showComments), badge: comments.length > 0 ? comments.length : null },
-                  { icon: <Settings size={17} />, action: () => setShowSettings(!showSettings), badge: null },
+                  { icon: <List size={17} />, action: () => setShowChapterList(!showChapterList) },
+                  { icon: <Settings size={17} />, action: () => setShowSettings(!showSettings) },
                 ].map((btn, i) => (
                   <button
                     key={i}
                     onClick={btn.action}
-                    className="p-2 rounded-xl relative transition-colors"
+                    className="p-2 rounded-xl transition-colors"
                     style={{ color: DARK.textMuted }}
                     onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = DARK.hover; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
                   >
                     {btn.icon}
-                    {btn.badge && (
-                      <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center"
-                        style={{ background: DARK.accent, color: "#000" }}>
-                        {btn.badge}
-                      </span>
-                    )}
                   </button>
                 ))}
               </div>
@@ -428,7 +420,7 @@ export default function Reader() {
       </AnimatePresence>
 
       {/* ── Pages ── */}
-      <div className="pt-14 pb-20">
+      <div className="pt-14">
         {settings.readMode === "vertical" ? (
           <div className="flex flex-col items-center gap-0.5">
             {chapter.pages.map((page, idx) => (
@@ -478,129 +470,136 @@ export default function Reader() {
             </div>
           </div>
         )}
-      </div>
 
-      {/* ── Bottom Bar ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-md"
-        style={{ background: DARK.bar, borderTop: `1px solid ${DARK.border}` }}>
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          {chapter.prevChapter ? (
-            <Link href={`/reader/${chapter.prevChapter.id}`}>
-              <button
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all"
-                style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
-              >
-                <ChevronLeft size={15} /> Ch.{chapter.prevChapter.number}
-              </button>
-            </Link>
-          ) : <div />}
+        {/* ── Chapter End + Comments ── */}
+        <div className="max-w-2xl mx-auto px-4 pb-28 mt-2">
+          {/* End divider */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px" style={{ background: DARK.border }} />
+            <span className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
+              style={{ color: DARK.textMuted, background: DARK.panel, border: `1px solid ${DARK.border}` }}>
+              {t("chapter")} {chapter.number} — {t("end") || "پایان"}
+            </span>
+            <div className="flex-1 h-px" style={{ background: DARK.border }} />
+          </div>
 
-          <div className="text-xs text-center tabular-nums" style={{ color: DARK.textMuted }}>
-            {settings.readMode === "vertical" ? (
-              <>{currentPage} / {chapter.pages.length}</>
+          {/* Chapter navigation */}
+          <div className="flex items-center justify-between gap-3 mb-8">
+            {chapter.prevChapter ? (
+              <Link href={`/reader/${chapter.prevChapter.id}`}>
+                <button className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-xl transition-all"
+                  style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}>
+                  <ChevronLeft size={15} /> {t("chapter")} {chapter.prevChapter.number}
+                </button>
+              </Link>
+            ) : <div />}
+            {chapter.nextChapter ? (
+              <Link href={`/reader/${chapter.nextChapter.id}`}>
+                <button className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-xl transition-all"
+                  style={{ background: DARK.accent, color: "#000" }}>
+                  {t("chapter")} {chapter.nextChapter.number} <ChevronRight size={15} />
+                </button>
+              </Link>
             ) : (
-              <>Ch.{chapter.number}</>
+              <Link href={`/series/${chapter.series.id}`}>
+                <button className="px-4 py-2.5 text-sm font-medium rounded-xl"
+                  style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}>
+                  ✓ {t("done") || "پایان سری"}
+                </button>
+              </Link>
             )}
           </div>
 
-          {chapter.nextChapter ? (
-            <Link href={`/reader/${chapter.nextChapter.id}`}>
+          {/* Rating */}
+          <div className="rounded-2xl p-4 mb-4" style={{ background: DARK.panel, border: `1px solid ${DARK.border}` }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: DARK.textMuted }}>{t("rating") || "امتیاز"}</p>
+            <div className="flex gap-2 items-center">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button key={s} onClick={() => submitRating(s)} disabled={!user}
+                  className="transition-transform active:scale-90">
+                  <Star size={26}
+                    className={s <= rating ? "fill-yellow-400" : ""}
+                    style={{ color: s <= rating ? "#facc15" : "#333" }} />
+                </button>
+              ))}
+              {ratingData && (
+                <span className="text-sm ml-2" style={{ color: DARK.textMuted }}>
+                  {Number(ratingData.average).toFixed(1)} <span style={{ color: "#555" }}>({ratingData.count})</span>
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Comments header */}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-sm" style={{ color: DARK.text }}>
+              {t("comments") || "کامنت‌ها"}
+              {comments.length > 0 && (
+                <span className="ml-2 text-xs font-normal px-2 py-0.5 rounded-full"
+                  style={{ background: "rgba(96,207,255,0.1)", color: DARK.accent }}>
+                  {comments.length}
+                </span>
+              )}
+            </h3>
+          </div>
+
+          {/* Add comment */}
+          {user ? (
+            <div className="flex gap-2 mb-4">
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder={t("addComment") || "کامنت بنویس..."}
+                className="flex-1 px-4 py-2.5 text-sm rounded-xl focus:outline-none"
+                style={{ background: DARK.panel, color: DARK.text, border: `1px solid ${DARK.border}` }}
+                onKeyDown={(e) => e.key === "Enter" && submitComment()}
+              />
               <button
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all"
+                onClick={submitComment}
+                className="px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5 text-sm font-medium"
                 style={{ background: DARK.accent, color: "#000" }}
               >
-                Ch.{chapter.nextChapter.number} <ChevronRight size={15} />
+                <Send size={14} />
               </button>
-            </Link>
+            </div>
           ) : (
-            <Link href={`/series/${chapter.series.id}`}>
-              <button
-                className="px-4 py-2 text-sm font-medium rounded-xl transition-colors"
-                style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}
-              >
-                ✓ Done
-              </button>
-            </Link>
+            <div className="mb-4 px-4 py-3 rounded-xl text-sm text-center" style={{ background: DARK.panel, color: DARK.textMuted, border: `1px solid ${DARK.border}` }}>
+              <Link href="/login"><span style={{ color: DARK.accent }}>ورود</span></Link> کن تا کامنت بذاری
+            </div>
           )}
+
+          {/* Comment list */}
+          <div className="space-y-3">
+            {comments.length === 0 ? (
+              <div className="text-center py-10 text-sm" style={{ color: "#444" }}>
+                هنوز کامنتی نیست. اولین نفر باش!
+              </div>
+            ) : (
+              [...comments].reverse().map((c) => (
+                <div key={c.id} className="rounded-xl p-3.5" style={{ background: DARK.panel, border: `1px solid ${DARK.border}` }}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold" style={{ color: DARK.accent }}>{c.username}</span>
+                    <span className="text-[10px]" style={{ color: DARK.textMuted }}>
+                      {new Date(c.createdAt).toLocaleDateString("fa-IR")}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: DARK.text }}>{c.text}</p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── Comments & Rating Drawer ── */}
-      <AnimatePresence>
-        {showComments && (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-80 z-50 flex flex-col"
-            style={{ background: DARK.panel, borderLeft: `1px solid ${DARK.border}` }}
-          >
-            <div className="flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${DARK.border}` }}>
-              <h2 className="font-bold" style={{ color: DARK.text }}>{t("comments")}</h2>
-              <button onClick={() => setShowComments(false)} style={{ color: DARK.textMuted }}>
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Rating */}
-            <div className="px-4 py-3" style={{ background: DARK.hover, borderBottom: `1px solid ${DARK.border}` }}>
-              <p className="text-xs font-medium mb-2" style={{ color: DARK.textMuted }}>{t("rating")}</p>
-              <div className="flex gap-1 items-center">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button key={s} onClick={() => submitRating(s)} disabled={!user}>
-                    <Star size={20} className={s <= rating ? "text-yellow-400 fill-yellow-400" : ""} style={{ color: s <= rating ? "#facc15" : "#444" }} />
-                  </button>
-                ))}
-                {ratingData && (
-                  <span className="text-xs ml-2 self-center" style={{ color: DARK.textMuted }}>
-                    {Number(ratingData.average).toFixed(1)} ({ratingData.count})
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Comment list */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {comments.map((c) => (
-                <div key={c.id} className="rounded-xl p-3" style={{ background: DARK.hover }}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold" style={{ color: DARK.accent }}>{c.username}</span>
-                    <span className="text-[10px]" style={{ color: DARK.textMuted }}>{new Date(c.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <p className="text-sm" style={{ color: DARK.text }}>{c.text}</p>
-                </div>
-              ))}
-              {comments.length === 0 && (
-                <div className="text-center py-8 text-sm" style={{ color: DARK.textMuted }}>{t("noResults")}</div>
-              )}
-            </div>
-
-            {/* Add comment */}
-            {user && (
-              <div className="p-4" style={{ borderTop: `1px solid ${DARK.border}` }}>
-                <div className="flex gap-2">
-                  <input
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder={t("addComment")}
-                    className="flex-1 px-3 py-2 text-sm rounded-xl focus:outline-none"
-                    style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
-                    onKeyDown={(e) => e.key === "Enter" && submitComment()}
-                  />
-                  <button
-                    onClick={submitComment}
-                    className="p-2 rounded-xl transition-colors"
-                    style={{ background: DARK.accent, color: "#000" }}
-                  >
-                    <Send size={15} />
-                  </button>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ── Scrolling page counter (vertical mode only) ── */}
+      {settings.readMode === "vertical" && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+          <div className="px-3 py-1 rounded-full text-xs tabular-nums"
+            style={{ background: "rgba(10,10,10,0.85)", color: DARK.textMuted, border: `1px solid ${DARK.border}` }}>
+            {currentPage} / {chapter.pages.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
