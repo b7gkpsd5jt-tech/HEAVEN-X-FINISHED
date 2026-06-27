@@ -144,7 +144,16 @@ export default function ManageSeries() {
                   <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                     <span>{s._count?.chapters || 0} ch</span>
                     <span>·</span>
-                    <span className={`font-medium ${s.status === "ONGOING" ? "text-green-600" : s.status === "COMPLETED" ? "text-blue-600" : "text-gray-500"}`}>{s.status}</span>
+                    <span
+                      className="font-medium px-2 py-0.5 rounded-full text-xs"
+                      style={
+                        s.status === "ONGOING"   ? { background: "rgba(34,197,94,0.15)",  color: "#22c55e",  border: "1px solid rgba(34,197,94,0.3)" } :
+                        s.status === "COMPLETED" ? { background: "rgba(234,179,8,0.15)",  color: "#eab308",  border: "1px solid rgba(234,179,8,0.3)" } :
+                        s.status === "HIATUS"    ? { background: "rgba(251,146,60,0.15)", color: "#fb923c",  border: "1px solid rgba(251,146,60,0.3)" } :
+                        s.status === "DROPPED"   ? { background: "rgba(239,68,68,0.15)",  color: "#ef4444",  border: "1px solid rgba(239,68,68,0.3)" } :
+                        { color: "#aaa" }
+                      }
+                    >{s.status}</span>
                   </div>
                   <div className="flex gap-2 mt-3">
                     <Link href={`/admin/chapters?seriesId=${s.id}`}>

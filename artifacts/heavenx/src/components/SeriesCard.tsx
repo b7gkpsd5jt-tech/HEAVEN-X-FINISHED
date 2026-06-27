@@ -22,11 +22,11 @@ export default function SeriesCard({ series }: Props) {
   const { t } = useLang();
   const coverUrl = getImageUrl(series.cover);
 
-  const statusColors: Record<string, string> = {
-    ONGOING: "bg-green-100 text-green-700",
-    COMPLETED: "bg-blue-100 text-blue-700",
-    HIATUS: "bg-amber-100 text-amber-700",
-    DROPPED: "bg-red-100 text-red-700",
+  const statusStyles: Record<string, React.CSSProperties> = {
+    ONGOING:   { background: "rgba(34,197,94,0.18)",  color: "#22c55e",  border: "1px solid rgba(34,197,94,0.35)" },
+    COMPLETED: { background: "rgba(234,179,8,0.18)",  color: "#eab308",  border: "1px solid rgba(234,179,8,0.35)" },
+    HIATUS:    { background: "rgba(251,146,60,0.18)", color: "#fb923c",  border: "1px solid rgba(251,146,60,0.35)" },
+    DROPPED:   { background: "rgba(239,68,68,0.18)",  color: "#ef4444",  border: "1px solid rgba(239,68,68,0.35)" },
   };
   const statusLabel: Record<string, string> = {
     ONGOING: t("ongoing"),
@@ -38,7 +38,13 @@ export default function SeriesCard({ series }: Props) {
   return (
     <Link href={`/series/${series.id}`}>
       <div className="group cursor-pointer">
-        <div className="relative overflow-hidden rounded-xl bg-gray-100 aspect-[3/4] shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+        <div
+          className="relative overflow-hidden rounded-xl aspect-[3/4] transition-all duration-300 group-hover:-translate-y-1"
+          style={{
+            background: "#111",
+            boxShadow: "0 0 18px rgba(0,180,255,0.35), 0 0 40px rgba(0,120,220,0.18)",
+          }}
+        >
           {coverUrl ? (
             <img
               src={coverUrl}
@@ -61,7 +67,10 @@ export default function SeriesCard({ series }: Props) {
           {/* Status badge */}
           {series.status && (
             <div className="absolute top-2 right-2">
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColors[series.status] || "bg-gray-100 text-gray-700"}`}>
+              <span
+                className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                style={statusStyles[series.status] || { background: "rgba(100,100,100,0.2)", color: "#aaa", border: "1px solid rgba(100,100,100,0.3)" }}
+              >
                 {statusLabel[series.status] || series.status}
               </span>
             </div>
