@@ -1,19 +1,17 @@
 import { Router, Response, Request } from "express";
 import { db } from "@workspace/db";
 import { popupsTable } from "@workspace/db";
-import { eq, and, lte, gte, or, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { authenticate, requireAdmin, AuthRequest } from "../lib/auth";
 
 const router = Router();
 
-// Public: get active popups
+// Public: get active popups (schedule-filtered)
 router.get("/", async (_req: Request, res: Response) => {
   try {
     const now = new Date();
     const popups = await db.select().from(popupsTable).where(eq(popupsTable.isEnabled, true));
-    // Filter by schedule if set
     const active = popups.filter(p => {
-      if (!p.scheduleStart && !p.scheduleEnd) return true;
       const afterStart = !p.scheduleStart || p.scheduleStart <= now;
       const beforeEnd = !p.scheduleEnd || p.scheduleEnd >= now;
       return afterStart && beforeEnd;
@@ -36,12 +34,13 @@ router.get("/all", authenticate, requireAdmin, async (_req: AuthRequest, res: Re
 
 router.post("/", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const { title, content, buttonText, buttonUrl, closeText, isEnabled, scheduleStart, scheduleEnd } = req.body;
+    const { title, content, buttonText, buttonUrl, closeText, isEnabled, scheduleStart, scheduleEnd, displayDurationHours } = req.body;
     const [popup] = await db.insert(popupsTable).values({
       title, content, buttonText, buttonUrl, closeText,
       isEnabled: isEnabled ?? true,
       scheduleStart: scheduleStart ? new Date(scheduleStart) : null,
       scheduleEnd: scheduleEnd ? new Date(scheduleEnd) : null,
+      displayDurationHours: displayDurationHours ? Number(displayDurationHours) : null,
     }).returning();
     res.status(201).json(popup);
   } catch {
@@ -51,11 +50,12 @@ router.post("/", authenticate, requireAdmin, async (req: AuthRequest, res: Respo
 
 router.patch("/:id", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    const { scheduleStart, scheduleEnd, ...rest } = req.body;
+    const { scheduleStart, scheduleEnd, displayDurationHours, ...rest } = req.body;
     const [popup] = await db.update(popupsTable).set({
       ...rest,
       ...(scheduleStart !== undefined ? { scheduleStart: scheduleStart ? new Date(scheduleStart) : null } : {}),
       ...(scheduleEnd !== undefined ? { scheduleEnd: scheduleEnd ? new Date(scheduleEnd) : null } : {}),
+      ...(displayDurationHours !== undefined ? { displayDurationHours: displayDurationHours ? Number(displayDurationHours) : null } : {}),
     }).where(eq(popupsTable.id, req.params.id)).returning();
     if (!popup) { res.status(404).json({ error: "Not found" }); return; }
     res.json(popup);

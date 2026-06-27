@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -12,6 +12,7 @@ export const popupsTable = pgTable("popups", {
   isEnabled: boolean("is_enabled").notNull().default(true),
   scheduleStart: timestamp("schedule_start"),
   scheduleEnd: timestamp("schedule_end"),
+  displayDurationHours: integer("display_duration_hours"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
