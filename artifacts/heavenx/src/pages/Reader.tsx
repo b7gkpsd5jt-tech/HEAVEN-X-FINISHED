@@ -41,6 +41,17 @@ function saveSettings(s: ReaderSettings) {
   localStorage.setItem("hx_reader_settings", JSON.stringify(s));
 }
 
+const DARK = {
+  bg: "#000000",
+  bar: "rgba(10,10,10,0.97)",
+  panel: "#111111",
+  border: "#222222",
+  text: "#e8e8e8",
+  textMuted: "#888888",
+  hover: "#1a1a1a",
+  accent: "#60cfff",
+};
+
 export default function Reader() {
   const { id } = useParams();
   const { t } = useLang();
@@ -68,26 +79,20 @@ export default function Reader() {
     setCurrentPage(1);
     setCurrentHPage(0);
     progressSavedRef.current = false;
-
     apiFetch<Chapter>(`/chapters/${id}`)
-      .then(setChapter)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then(setChapter).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
 
   useEffect(() => {
     if (!chapter) return;
     apiFetch<Comment[]>(`/comments/chapter/${chapter.id}`).then(setComments).catch(() => {});
     apiFetch<{ id: string; number: number; title?: string }[]>(`/chapters/series/${chapter.series.id}`)
-      .then(setAllChapters)
-      .catch(() => {});
-    // Load existing rating for this chapter
+      .then(setAllChapters).catch(() => {});
     apiFetch<{ average: number; count: number; userRating: number }>(`/ratings/chapter/${chapter.id}`)
       .then(data => {
         setRatingData({ average: data.average, count: data.count });
         if (data.userRating > 0) setRating(data.userRating);
-      })
-      .catch(() => {});
+      }).catch(() => {});
   }, [chapter]);
 
   useEffect(() => {
@@ -104,11 +109,8 @@ export default function Reader() {
   useEffect(() => {
     const onScroll = () => {
       const current = window.scrollY;
-      if (current < 50 || current < lastScrollRef.current) {
-        setHeaderVisible(true);
-      } else {
-        setHeaderVisible(false);
-      }
+      if (current < 50 || current < lastScrollRef.current) setHeaderVisible(true);
+      else setHeaderVisible(false);
       lastScrollRef.current = current;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -147,26 +149,6 @@ export default function Reader() {
     } catch {}
   };
 
-  // Redirect unauthenticated users
-  if (!authLoading && !user) {
-    return <Redirect to="/login" />;
-  }
-
-  if (loading || authLoading) return (
-    <div className={`min-h-screen flex items-center justify-center ${settings.nightMode ? "bg-gray-950" : "bg-gray-50"}`}>
-      <div className="animate-spin w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full" />
-    </div>
-  );
-
-  if (!chapter) return (
-    <div className="min-h-screen bg-white flex items-center justify-center text-gray-500">
-      Chapter not found
-    </div>
-  );
-
-  const bgColor = settings.nightMode ? "#0a0a0a" : "#f8f8f8";
-
-  // Build CSS filter: brightness + invert colors (no quality loss, CSS-only)
   const buildFilter = () => {
     const parts: string[] = [];
     if (settings.brightness !== 100) parts.push(`brightness(${settings.brightness / 100})`);
@@ -174,73 +156,91 @@ export default function Reader() {
     if (settings.invertColors) parts.push("invert(1)");
     return parts.join(" ") || "none";
   };
+
+  if (!authLoading && !user) return <Redirect to="/login" />;
+
+  if (loading || authLoading) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: DARK.bg }}>
+      <div className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full" style={{ borderColor: `${DARK.accent} ${DARK.accent} ${DARK.accent} transparent` }} />
+    </div>
+  );
+
+  if (!chapter) return (
+    <div className="min-h-screen flex items-center justify-center text-sm" style={{ background: DARK.bg, color: DARK.textMuted }}>
+      Chapter not found
+    </div>
+  );
+
   const filterStyle = buildFilter();
 
   return (
-    <div className="min-h-screen select-none" style={{ background: bgColor }}>
-      {/* Sticky Header */}
+    <div className="min-h-screen select-none" style={{ background: DARK.bg }}>
+
+      {/* ── Top Bar ── */}
       <AnimatePresence>
         {headerVisible && (
           <motion.div
             initial={{ y: -60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -60, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-40 bg-white/96 backdrop-blur-md border-b border-gray-100 shadow-sm"
+            className="fixed top-0 left-0 right-0 z-40 backdrop-blur-md"
+            style={{ background: DARK.bar, borderBottom: `1px solid ${DARK.border}` }}
           >
             <div className="max-w-3xl mx-auto px-3 h-14 flex items-center justify-between gap-2">
               <Link href={`/series/${chapter.series.id}`}>
-                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors truncate max-w-[160px]">
+                <div className="flex items-center gap-1.5 text-sm font-medium truncate max-w-[160px] transition-colors"
+                  style={{ color: DARK.textMuted }}>
                   <ChevronLeft size={16} />
                   <span className="truncate">{chapter.series.title}</span>
                 </div>
               </Link>
 
-              <div className="text-sm font-semibold text-gray-900 flex-shrink-0">
+              <div className="text-sm font-semibold flex-shrink-0" style={{ color: DARK.text }}>
                 {t("chapter")} {chapter.number}
               </div>
 
               <div className="flex items-center gap-0.5">
-                <button
-                  onClick={() => setShowChapterList(!showChapterList)}
-                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  <List size={17} />
-                </button>
-                <button
-                  onClick={() => setShowComments(!showComments)}
-                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors relative"
-                >
-                  <MessageSquare size={17} />
-                  {comments.length > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                      {comments.length}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => setShowSettings(!showSettings)}
-                  className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
-                >
-                  <Settings size={17} />
-                </button>
+                {[
+                  { icon: <List size={17} />, action: () => setShowChapterList(!showChapterList), badge: null },
+                  { icon: <MessageSquare size={17} />, action: () => setShowComments(!showComments), badge: comments.length > 0 ? comments.length : null },
+                  { icon: <Settings size={17} />, action: () => setShowSettings(!showSettings), badge: null },
+                ].map((btn, i) => (
+                  <button
+                    key={i}
+                    onClick={btn.action}
+                    className="p-2 rounded-xl relative transition-colors"
+                    style={{ color: DARK.textMuted }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = DARK.hover; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                  >
+                    {btn.icon}
+                    {btn.badge && (
+                      <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center"
+                        style={{ background: DARK.accent, color: "#000" }}>
+                        {btn.badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Settings Panel */}
+      {/* ── Settings Panel ── */}
       <AnimatePresence>
         {showSettings && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="fixed top-14 right-4 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 w-72"
+            className="fixed top-14 right-4 z-50 rounded-2xl shadow-2xl p-4 w-72"
+            style={{ background: DARK.panel, border: `1px solid ${DARK.border}` }}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-gray-900">{t("settings")}</h3>
-              <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="font-semibold text-sm" style={{ color: DARK.text }}>{t("settings")}</h3>
+              <button onClick={() => setShowSettings(false)} style={{ color: DARK.textMuted }}>
                 <X size={16} />
               </button>
             </div>
@@ -248,27 +248,29 @@ export default function Reader() {
             <div className="space-y-4">
               {/* Night mode */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm" style={{ color: DARK.text }}>
                   {settings.nightMode ? <Moon size={14} /> : <Sun size={14} />}
                   {t("nightMode")}
                 </div>
                 <button
                   onClick={() => updateSettings({ nightMode: !settings.nightMode })}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${settings.nightMode ? "bg-indigo-600" : "bg-gray-200"}`}
+                  className="relative w-11 h-6 rounded-full transition-colors"
+                  style={{ background: settings.nightMode ? DARK.accent : "#333" }}
                 >
                   <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.nightMode ? "translate-x-5" : "translate-x-0.5"}`} />
                 </button>
               </div>
 
-              {/* Classic Invert Colors */}
+              {/* Invert Colors */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
+                <div className="flex items-center gap-2 text-sm" style={{ color: DARK.text }}>
                   <Contrast size={14} />
                   Invert Colors
                 </div>
                 <button
                   onClick={() => updateSettings({ invertColors: !settings.invertColors })}
-                  className={`relative w-11 h-6 rounded-full transition-colors ${settings.invertColors ? "bg-indigo-600" : "bg-gray-200"}`}
+                  className="relative w-11 h-6 rounded-full transition-colors"
+                  style={{ background: settings.invertColors ? DARK.accent : "#333" }}
                 >
                   <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${settings.invertColors ? "translate-x-5" : "translate-x-0.5"}`} />
                 </button>
@@ -276,38 +278,36 @@ export default function Reader() {
 
               {/* Brightness */}
               <div>
-                <div className="flex justify-between text-sm text-gray-700 mb-1.5">
+                <div className="flex justify-between text-sm mb-1.5" style={{ color: DARK.text }}>
                   <span>{t("brightness")}</span>
-                  <span className="font-medium text-gray-500">{settings.brightness}%</span>
+                  <span style={{ color: DARK.textMuted }}>{settings.brightness}%</span>
                 </div>
-                <input
-                  type="range" min="30" max="150" value={settings.brightness}
+                <input type="range" min="30" max="150" value={settings.brightness}
                   onChange={(e) => updateSettings({ brightness: Number(e.target.value) })}
-                  className="w-full accent-indigo-600"
-                />
+                  className="w-full" style={{ accentColor: DARK.accent }} />
               </div>
 
               {/* Zoom */}
               <div>
-                <div className="flex justify-between text-sm text-gray-700 mb-1.5">
+                <div className="flex justify-between text-sm mb-1.5" style={{ color: DARK.text }}>
                   <span>{t("zoom")}</span>
-                  <span className="font-medium text-gray-500">{settings.zoom}%</span>
+                  <span style={{ color: DARK.textMuted }}>{settings.zoom}%</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => updateSettings({ zoom: Math.max(50, settings.zoom - 10) })}
-                    className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ background: DARK.hover, color: DARK.text }}
                   >
                     <ZoomOut size={14} />
                   </button>
-                  <input
-                    type="range" min="50" max="200" value={settings.zoom}
+                  <input type="range" min="50" max="200" value={settings.zoom}
                     onChange={(e) => updateSettings({ zoom: Number(e.target.value) })}
-                    className="flex-1 accent-indigo-600"
-                  />
+                    className="flex-1" style={{ accentColor: DARK.accent }} />
                   <button
                     onClick={() => updateSettings({ zoom: Math.min(200, settings.zoom + 10) })}
-                    className="p-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    className="p-1.5 rounded-lg transition-colors"
+                    style={{ background: DARK.hover, color: DARK.text }}
                   >
                     <ZoomIn size={14} />
                   </button>
@@ -316,13 +316,16 @@ export default function Reader() {
 
               {/* Read mode */}
               <div>
-                <p className="text-sm text-gray-700 mb-2">Mode</p>
+                <p className="text-sm mb-2" style={{ color: DARK.text }}>Mode</p>
                 <div className="flex gap-2">
                   {(["vertical", "horizontal"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => updateSettings({ readMode: m })}
-                      className={`flex-1 py-2 text-xs font-medium rounded-xl transition-all ${settings.readMode === m ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                      className="flex-1 py-2 text-xs font-medium rounded-xl transition-all"
+                      style={settings.readMode === m
+                        ? { background: DARK.accent, color: "#000" }
+                        : { background: DARK.hover, color: DARK.textMuted }}
                     >
                       {m === "vertical" ? "⬇ Vertical" : "➡ Horizontal"}
                     </button>
@@ -332,11 +335,9 @@ export default function Reader() {
 
               {/* Reset */}
               <button
-                onClick={() => {
-                  const def: ReaderSettings = { zoom: 100, brightness: 100, nightMode: false, invertColors: false, readMode: "vertical" };
-                  updateSettings(def);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+                onClick={() => updateSettings({ zoom: 100, brightness: 100, nightMode: false, invertColors: false, readMode: "vertical" })}
+                className="w-full flex items-center justify-center gap-2 py-2 text-xs rounded-xl transition-colors"
+                style={{ background: DARK.hover, color: DARK.textMuted }}
               >
                 <RotateCcw size={12} /> Reset
               </button>
@@ -345,27 +346,34 @@ export default function Reader() {
         )}
       </AnimatePresence>
 
-      {/* Chapter list panel */}
+      {/* ── Chapter List Panel ── */}
       <AnimatePresence>
         {showChapterList && (
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="fixed top-14 right-4 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 w-64 max-h-96 overflow-y-auto"
+            className="fixed top-14 right-4 z-50 rounded-2xl shadow-2xl w-64 max-h-96 overflow-y-auto"
+            style={{ background: DARK.panel, border: `1px solid ${DARK.border}` }}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center">
-              <h3 className="font-semibold text-gray-900 text-sm">{t("chapterList")}</h3>
-              <button onClick={() => setShowChapterList(false)} className="text-gray-400 hover:text-gray-600">
+            <div className="sticky top-0 px-4 py-3 flex justify-between items-center"
+              style={{ background: DARK.panel, borderBottom: `1px solid ${DARK.border}` }}>
+              <h3 className="font-semibold text-sm" style={{ color: DARK.text }}>{t("chapterList")}</h3>
+              <button onClick={() => setShowChapterList(false)} style={{ color: DARK.textMuted }}>
                 <X size={14} />
               </button>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div>
               {[...allChapters].reverse().map((ch) => (
                 <Link key={ch.id} href={`/reader/${ch.id}`}>
                   <div
                     onClick={() => setShowChapterList(false)}
-                    className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-indigo-50 transition-colors ${ch.id === id ? "bg-indigo-50 text-indigo-600 font-semibold" : "text-gray-700"}`}
+                    className="px-4 py-2.5 text-sm cursor-pointer transition-colors"
+                    style={ch.id === id
+                      ? { background: "rgba(96,207,255,0.1)", color: DARK.accent, fontWeight: 600 }
+                      : { color: DARK.text }}
+                    onMouseEnter={e => { if (ch.id !== id) (e.currentTarget as HTMLDivElement).style.background = DARK.hover; }}
+                    onMouseLeave={e => { if (ch.id !== id) (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
                   >
                     {t("chapter")} {ch.number}{ch.title ? `: ${ch.title}` : ""}
                   </div>
@@ -376,7 +384,7 @@ export default function Reader() {
         )}
       </AnimatePresence>
 
-      {/* Pages */}
+      {/* ── Pages ── */}
       <div className="pt-14 pb-20">
         {settings.readMode === "vertical" ? (
           <div className="flex flex-col items-center gap-0.5">
@@ -387,17 +395,8 @@ export default function Reader() {
                 alt=""
                 loading="lazy"
                 onLoad={() => { if (idx + 1 > currentPage) setCurrentPage(idx + 1); }}
-                onError={(e) => {
-                  const el = e.target as HTMLImageElement;
-                  el.style.display = "none";
-                }}
-                style={{
-                  width: `${settings.zoom}%`,
-                  maxWidth: "900px",
-                  filter: filterStyle,
-                  display: "block",
-                  margin: "0 auto",
-                }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                style={{ width: `${settings.zoom}%`, maxWidth: "900px", filter: filterStyle, display: "block", margin: "0 auto" }}
               />
             ))}
           </div>
@@ -408,17 +407,9 @@ export default function Reader() {
                 <img
                   src={getImageUrl(chapter.pages[currentHPage].filePath) || ""}
                   alt=""
-                  style={{
-                    maxHeight: "100%",
-                    maxWidth: "100%",
-                    filter: filterStyle,
-                    width: `${settings.zoom}%`,
-                  }}
+                  style={{ maxHeight: "100%", maxWidth: "100%", filter: filterStyle, width: `${settings.zoom}%` }}
                   className="object-contain"
-                  onError={(e) => {
-                    const el = e.target as HTMLImageElement;
-                    el.style.display = "none";
-                  }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
             )}
@@ -426,17 +417,19 @@ export default function Reader() {
               <button
                 disabled={currentHPage === 0}
                 onClick={() => setCurrentHPage(p => p - 1)}
-                className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+                className="p-3 rounded-xl disabled:opacity-40 transition-colors"
+                style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
               >
                 <ChevronLeft size={18} />
               </button>
-              <span className="text-sm text-gray-500 font-medium tabular-nums">
+              <span className="text-sm font-medium tabular-nums" style={{ color: DARK.textMuted }}>
                 {currentHPage + 1} / {chapter.pages.length}
               </span>
               <button
                 disabled={currentHPage >= chapter.pages.length - 1}
                 onClick={() => setCurrentHPage(p => p + 1)}
-                className="p-3 rounded-xl bg-white shadow-sm border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
+                className="p-3 rounded-xl disabled:opacity-40 transition-colors"
+                style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
               >
                 <ChevronRight size={18} />
               </button>
@@ -445,18 +438,22 @@ export default function Reader() {
         )}
       </div>
 
-      {/* Bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/96 backdrop-blur-md border-t border-gray-100 shadow-lg">
+      {/* ── Bottom Bar ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 backdrop-blur-md"
+        style={{ background: DARK.bar, borderTop: `1px solid ${DARK.border}` }}>
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           {chapter.prevChapter ? (
             <Link href={`/reader/${chapter.prevChapter.id}`}>
-              <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+              <button
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all"
+                style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
+              >
                 <ChevronLeft size={15} /> Ch.{chapter.prevChapter.number}
               </button>
             </Link>
           ) : <div />}
 
-          <div className="text-xs text-gray-400 text-center tabular-nums">
+          <div className="text-xs text-center tabular-nums" style={{ color: DARK.textMuted }}>
             {settings.readMode === "vertical" ? (
               <>{currentPage} / {chapter.pages.length}</>
             ) : (
@@ -466,13 +463,19 @@ export default function Reader() {
 
           {chapter.nextChapter ? (
             <Link href={`/reader/${chapter.nextChapter.id}`}>
-              <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all">
+              <button
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all"
+                style={{ background: DARK.accent, color: "#000" }}
+              >
                 Ch.{chapter.nextChapter.number} <ChevronRight size={15} />
               </button>
             </Link>
           ) : (
             <Link href={`/series/${chapter.series.id}`}>
-              <button className="px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700 rounded-xl hover:bg-emerald-200 transition-colors">
+              <button
+                className="px-4 py-2 text-sm font-medium rounded-xl transition-colors"
+                style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }}
+              >
                 ✓ Done
               </button>
             </Link>
@@ -480,7 +483,7 @@ export default function Reader() {
         </div>
       </div>
 
-      {/* Comments & Rating Drawer */}
+      {/* ── Comments & Rating Drawer ── */}
       <AnimatePresence>
         {showComments && (
           <motion.div
@@ -488,26 +491,27 @@ export default function Reader() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed top-0 right-0 bottom-0 w-80 z-50 bg-white shadow-2xl border-l border-gray-100 flex flex-col"
+            className="fixed top-0 right-0 bottom-0 w-80 z-50 flex flex-col"
+            style={{ background: DARK.panel, borderLeft: `1px solid ${DARK.border}` }}
           >
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <h2 className="font-bold text-gray-900">{t("comments")}</h2>
-              <button onClick={() => setShowComments(false)} className="text-gray-400 hover:text-gray-600">
+            <div className="flex items-center justify-between p-4" style={{ borderBottom: `1px solid ${DARK.border}` }}>
+              <h2 className="font-bold" style={{ color: DARK.text }}>{t("comments")}</h2>
+              <button onClick={() => setShowComments(false)} style={{ color: DARK.textMuted }}>
                 <X size={18} />
               </button>
             </div>
 
             {/* Rating */}
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-              <p className="text-xs font-medium text-gray-500 mb-2">{t("rating")}</p>
-              <div className="flex gap-1">
+            <div className="px-4 py-3" style={{ background: DARK.hover, borderBottom: `1px solid ${DARK.border}` }}>
+              <p className="text-xs font-medium mb-2" style={{ color: DARK.textMuted }}>{t("rating")}</p>
+              <div className="flex gap-1 items-center">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button key={s} onClick={() => submitRating(s)} disabled={!user}>
-                    <Star size={20} className={s <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} />
+                    <Star size={20} className={s <= rating ? "text-yellow-400 fill-yellow-400" : ""} style={{ color: s <= rating ? "#facc15" : "#444" }} />
                   </button>
                 ))}
                 {ratingData && (
-                  <span className="text-xs text-gray-500 ml-2 self-center">
+                  <span className="text-xs ml-2 self-center" style={{ color: DARK.textMuted }}>
                     {Number(ratingData.average).toFixed(1)} ({ratingData.count})
                   </span>
                 )}
@@ -517,31 +521,36 @@ export default function Reader() {
             {/* Comment list */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {comments.map((c) => (
-                <div key={c.id} className="bg-gray-50 rounded-xl p-3">
+                <div key={c.id} className="rounded-xl p-3" style={{ background: DARK.hover }}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-indigo-600">{c.username}</span>
-                    <span className="text-[10px] text-gray-400">{new Date(c.createdAt).toLocaleDateString()}</span>
+                    <span className="text-xs font-bold" style={{ color: DARK.accent }}>{c.username}</span>
+                    <span className="text-[10px]" style={{ color: DARK.textMuted }}>{new Date(c.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-sm text-gray-700">{c.text}</p>
+                  <p className="text-sm" style={{ color: DARK.text }}>{c.text}</p>
                 </div>
               ))}
               {comments.length === 0 && (
-                <div className="text-center py-8 text-gray-400 text-sm">{t("noResults")}</div>
+                <div className="text-center py-8 text-sm" style={{ color: DARK.textMuted }}>{t("noResults")}</div>
               )}
             </div>
 
             {/* Add comment */}
             {user && (
-              <div className="p-4 border-t border-gray-100">
+              <div className="p-4" style={{ borderTop: `1px solid ${DARK.border}` }}>
                 <div className="flex gap-2">
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder={t("addComment")}
-                    className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-gray-50"
+                    className="flex-1 px-3 py-2 text-sm rounded-xl focus:outline-none"
+                    style={{ background: DARK.hover, color: DARK.text, border: `1px solid ${DARK.border}` }}
                     onKeyDown={(e) => e.key === "Enter" && submitComment()}
                   />
-                  <button onClick={submitComment} className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700">
+                  <button
+                    onClick={submitComment}
+                    className="p-2 rounded-xl transition-colors"
+                    style={{ background: DARK.accent, color: "#000" }}
+                  >
                     <Send size={15} />
                   </button>
                 </div>
