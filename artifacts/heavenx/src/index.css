@@ -203,3 +203,12 @@ input, textarea, select {
   border-color: #2a2a2a;
 }
 input::placeholder, textarea::placeholder { color: #555555; }
+
+/* ==================== PERSIAN (FA) FONT ==================== */
+.lang-fa *,
+.lang-fa input,
+.lang-fa textarea,
+.lang-fa select,
+.lang-fa button {
+  font-family: 'Lalezar', cursive !important;
+}
