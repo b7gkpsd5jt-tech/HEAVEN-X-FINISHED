@@ -144,12 +144,10 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
-              <label
-                className="block mb-1.5"
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.06em", color: "#aaaaaa", textShadow: "0 1px 6px rgba(255,255,255,0.15)" }}
-              >
+              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
                 {t("username")}
               </label>
+              <div className="mb-2 rounded-full" style={{ height: "2px", background: "linear-gradient(90deg, #60cfff, rgba(0,180,255,0.15))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
               <div className="relative">
                 <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
                 <input
@@ -167,12 +165,10 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label
-                className="block mb-1.5"
-                style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: "0.8rem", letterSpacing: "0.06em", color: "#aaaaaa", textShadow: "0 1px 6px rgba(255,255,255,0.15)" }}
-              >
+              <label className="block mb-1" style={{ fontWeight: 700, fontSize: "0.85rem", color: "#60cfff", textShadow: "0 0 10px rgba(0,180,255,0.8)" }}>
                 {t("password")}
               </label>
+              <div className="mb-2 rounded-full" style={{ height: "2px", background: "linear-gradient(90deg, #60cfff, rgba(0,180,255,0.15))", boxShadow: "0 0 6px rgba(0,180,255,0.6)" }} />
               <div className="relative">
                 <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555" }} />
                 <input
