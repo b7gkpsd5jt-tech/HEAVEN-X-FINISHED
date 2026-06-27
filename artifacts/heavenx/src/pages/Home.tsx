@@ -127,7 +127,17 @@ export default function Home() {
               </svg>
 
             </div>
-            <p className="text-white/75 mb-1" style={{ fontSize: "clamp(0.8rem, 2vw, 1.1rem)" }}>
+            <p
+              dir="rtl"
+              style={{
+                fontSize: "clamp(0.85rem, 2.2vw, 1.15rem)",
+                color: "#60cfff",
+                textShadow: "0 0 10px rgba(0,180,255,0.8), 0 0 22px rgba(0,140,220,0.5)",
+                fontFamily: (settings as any).bannerOverlayFont || "'Vazirmatn', sans-serif",
+                fontWeight: 600,
+                marginBottom: "4px",
+              }}
+            >
               {settings.bannerOverlayText || "بهشت منهوا — بهترین مانهواها به زبان فارسی"}
             </p>
           </motion.div>

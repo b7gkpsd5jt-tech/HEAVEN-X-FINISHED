@@ -6,9 +6,20 @@ import { Upload, Image, X, Trash2 } from "lucide-react";
 interface Settings {
   bannerUrl?: string;
   bannerOverlayText?: string;
+  bannerOverlayFont?: string;
   siteName?: string;
   announcement?: string;
 }
+
+const PERSIAN_FONTS = [
+  { label: "Vazirmatn — وزیرمتن (مدرن)", value: "'Vazirmatn', sans-serif" },
+  { label: "Lalezar — لاله‌زار (پررنگ)", value: "'Lalezar', cursive" },
+  { label: "Amiri — عامری (کلاسیک)", value: "'Amiri', serif" },
+  { label: "Scheherazade — شهرزاد (نستعلیق)", value: "'Scheherazade New', serif" },
+  { label: "Noto Nastaliq — نستعلیق", value: "'Noto Nastaliq Urdu', serif" },
+  { label: "Reem Kufi — ریم کوفی (هندسی)", value: "'Reem Kufi', sans-serif" },
+  { label: "Markazi Text — مرکزی (ظریف)", value: "'Markazi Text', serif" },
+];
 
 export default function ManageBanners() {
   const { t } = useLang();
@@ -18,12 +29,14 @@ export default function ManageBanners() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [overlayText, setOverlayText] = useState("");
+  const [overlayFont, setOverlayFont] = useState("'Vazirmatn', sans-serif");
   const [announcement, setAnnouncement] = useState("");
 
   useEffect(() => {
     apiFetch<Settings>("/settings").then(s => {
       setSettings(s);
       setOverlayText(s.bannerOverlayText || "");
+      setOverlayFont(s.bannerOverlayFont || "'Vazirmatn', sans-serif");
       setAnnouncement(s.announcement || "");
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
@@ -60,7 +73,7 @@ export default function ManageBanners() {
     try {
       await apiFetch("/settings", {
         method: "PATCH",
-        body: JSON.stringify({ bannerOverlayText: overlayText, announcement }),
+        body: JSON.stringify({ bannerOverlayText: overlayText, bannerOverlayFont: overlayFont, announcement }),
       });
       setMessage({ type: "success", text: t("success") });
     } catch (err: any) {
@@ -150,13 +163,40 @@ export default function ManageBanners() {
         {/* Text settings */}
         <div className="rounded-2xl border p-5" style={{ background: "#111", borderColor: "#222" }}>
           <h2 className="font-semibold mb-3" style={{ color: "#f0f0f0" }}>Banner Overlay-Text</h2>
+
           <input
             value={overlayText}
             onChange={e => setOverlayText(e.target.value)}
-            className="w-full px-3 py-2.5 text-sm rounded-xl mb-4 focus:outline-none"
+            className="w-full px-3 py-2.5 text-sm rounded-xl mb-3 focus:outline-none"
             style={{ background: "#1a1a1a", color: "#f0f0f0", border: "1px solid #2a2a2a" }}
             placeholder="بهشت منهوا — بهترین مانهواها به زبان فارسی"
+            dir="rtl"
           />
+
+          {/* Font selector */}
+          <label className="text-xs font-medium block mb-2" style={{ color: "#888" }}>فونت فارسی</label>
+          <div className="grid gap-2 mb-4">
+            {PERSIAN_FONTS.map(f => (
+              <button
+                key={f.value}
+                type="button"
+                onClick={() => setOverlayFont(f.value)}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all text-left"
+                style={{
+                  background: overlayFont === f.value ? "rgba(0,136,204,0.15)" : "#1a1a1a",
+                  border: overlayFont === f.value ? "1px solid rgba(0,136,204,0.5)" : "1px solid #2a2a2a",
+                  color: overlayFont === f.value ? "#60cfff" : "#aaa",
+                }}
+              >
+                <span style={{ fontFamily: f.value, fontSize: "1rem" }} dir="rtl">
+                  بهشت منهوا
+                </span>
+                <span className="text-xs ml-2" style={{ color: "#555", fontFamily: "Inter, sans-serif", flexShrink: 0 }}>
+                  {f.label.split("—")[0].trim()}
+                </span>
+              </button>
+            ))}
+          </div>
           <h2 className="font-semibold mb-2 mt-4" style={{ color: "#f0f0f0" }}>Ankündigung (Homepage)</h2>
           <input
             value={announcement}
