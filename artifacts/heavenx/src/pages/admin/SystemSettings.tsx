@@ -155,7 +155,7 @@ export default function SystemSettings() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all"
+          className="btn-on-white w-full py-3 font-semibold text-sm rounded-xl disabled:opacity-60 transition-all"
           style={{ background: "#ffffff", color: "#000000" }}
         >
           {saving ? t("loading") : t("save")}

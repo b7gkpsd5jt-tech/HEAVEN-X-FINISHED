@@ -105,7 +105,7 @@ export default function Navbar() {
                 <button
                   key={l}
                   onClick={() => setLang(l)}
-                  className="px-2 py-1 text-xs font-bold rounded-md transition-all"
+                  className={`px-2 py-1 text-xs font-bold rounded-md transition-all${lang === l ? " btn-on-white" : ""}`}
                   style={lang === l
                     ? { background: "#ffffff", color: "#000000" }
                     : { background: "transparent", color: "#666" }}
@@ -125,10 +125,8 @@ export default function Navbar() {
                 </div>
                 <button
                   onClick={logout}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-all"
-                  style={{ color: "#888" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "#ff6b6b"; (e.currentTarget as HTMLButtonElement).style.background = "#1a0a0a"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "#888"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                  className="btn-logout flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-all"
+                  style={{ color: "#ff6b6b" }}
                 >
                   <LogOut size={14} />
                   {t("logout")}
@@ -137,7 +135,7 @@ export default function Navbar() {
             ) : (
               <Link href="/login">
                 <button
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
+                  className="btn-on-white flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition-all"
                   style={{ background: "#ffffff", color: "#000000" }}
                 >
                   <LogIn size={14} />
@@ -201,7 +199,7 @@ export default function Navbar() {
                   <button
                     key={l}
                     onClick={() => setLang(l)}
-                    className="px-3 py-1.5 text-xs font-bold rounded-lg transition-all"
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all${lang === l ? " btn-on-white" : ""}`}
                     style={lang === l
                       ? { background: "#ffffff", color: "#000000" }
                       : { background: "#1a1a1a", color: "#666" }}
@@ -214,7 +212,7 @@ export default function Navbar() {
               {user ? (
                 <button
                   onClick={() => { logout(); setMobileOpen(false); }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all"
+                  className="btn-logout w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all"
                   style={{ color: "#ff6b6b" }}
                 >
                   <LogOut size={16} />
@@ -223,7 +221,7 @@ export default function Navbar() {
               ) : (
                 <Link href="/login">
                   <button
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg"
+                    className="btn-on-white w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-lg"
                     style={{ background: "#ffffff", color: "#000000" }}
                     onClick={() => setMobileOpen(false)}
                   >

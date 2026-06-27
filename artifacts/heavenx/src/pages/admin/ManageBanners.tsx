@@ -142,7 +142,7 @@ export default function ManageBanners() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
+              className="btn-on-white flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
               style={{ background: "#ffffff", color: "#000" }}
             >
               <Upload size={15} /> {saving ? t("loading") : "Banner hochladen"}
@@ -224,7 +224,7 @@ export default function ManageBanners() {
           <button
             onClick={saveSettings}
             disabled={saving}
-            className="px-5 py-2.5 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
+            className="btn-on-white px-5 py-2.5 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
             style={{ background: "#ffffff", color: "#000" }}
           >
             {saving ? t("loading") : t("save")}

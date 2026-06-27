@@ -209,6 +209,18 @@ body * {
   color: #60cfff !important;
 }
 
+/* Exceptions — white-bg buttons: black text */
+.btn-on-white,
+.btn-on-white * {
+  color: #000000 !important;
+}
+
+/* Exception — logout: red */
+.btn-logout,
+.btn-logout * {
+  color: #ff4d4d !important;
+}
+
 /* ==================== BASE FONT (DE / EN) ==================== */
 body,
 button,

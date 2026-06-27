@@ -210,7 +210,7 @@ export default function ManageChapters() {
   const tabBtn = (mode: "zip" | "images" | "multi-zip", icon: React.ReactNode, label: string) => (
     <button
       onClick={() => setUploadMode(mode)}
-      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold rounded-xl transition-all"
+      className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold rounded-xl transition-all${uploadMode === mode ? " btn-on-white" : ""}`}
       style={uploadMode === mode
         ? { background: "#ffffff", color: "#000" }
         : { background: "#1a1a1a", color: "#aaa" }}
@@ -313,7 +313,7 @@ export default function ManageChapters() {
                 <button
                   type="submit"
                   disabled={uploading || !selectedSeries || !chapterNum}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
+                  className="btn-on-white w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
                   style={{ background: "#ffffff", color: "#000" }}
                 >
                   {uploading
@@ -416,7 +416,7 @@ export default function ManageChapters() {
                   type="button"
                   onClick={handleMultiZipUpload}
                   disabled={uploading || !selectedSeries || !startChapterNum || multiZipEntries.length === 0}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
+                  className="btn-on-white w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all"
                   style={{ background: "#ffffff", color: "#000" }}
                 >
                   {uploading
