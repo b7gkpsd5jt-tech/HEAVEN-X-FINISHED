@@ -82,12 +82,15 @@ export default function SeriesDetail() {
         <div className="flex flex-col sm:flex-row gap-6">
           {/* Cover */}
           <div className="flex-shrink-0">
-            <div className="w-36 h-48 sm:w-44 sm:h-60 rounded-xl overflow-hidden shadow-xl border-2 border-white">
+            <div
+              className="w-36 h-48 sm:w-44 sm:h-60 rounded-xl overflow-hidden"
+              style={{ boxShadow: "0 0 24px rgba(0,180,255,0.5), 0 0 50px rgba(0,120,220,0.25), 0 8px 24px rgba(0,0,0,0.6)" }}
+            >
               {coverUrl ? (
                 <img src={coverUrl} alt={series.title} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-indigo-200 to-violet-200 flex items-center justify-center">
-                  <BookOpen size={32} className="text-indigo-400" />
+                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0a1a2a, #111)" }}>
+                  <BookOpen size={32} style={{ color: "#60cfff" }} />
                 </div>
               )}
             </div>
