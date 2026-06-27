@@ -48,8 +48,17 @@ router.delete("/:id", authenticate, requireAdmin, async (req: AuthRequest, res: 
 
 router.patch("/:id/hide", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
-    await db.update(commentsTable).set({ isHidden: "true" }).where(eq(commentsTable.id, req.params.id));
-    res.json({ message: "Comment hidden" });
+    const [updated] = await db.update(commentsTable).set({ isHidden: "true" }).where(eq(commentsTable.id, req.params.id)).returning();
+    res.json(updated);
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.patch("/:id/unhide", authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const [updated] = await db.update(commentsTable).set({ isHidden: "false" }).where(eq(commentsTable.id, req.params.id)).returning();
+    res.json(updated);
   } catch {
     res.status(500).json({ error: "Internal server error" });
   }

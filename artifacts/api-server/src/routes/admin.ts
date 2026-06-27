@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import { db } from "@workspace/db";
 import { usersTable, seriesTable, chaptersTable, chapterPagesTable, commentsTable } from "@workspace/db";
-import { count, desc } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { authenticate, requireAdmin, AuthRequest } from "../lib/auth";
 
 const router = Router();
@@ -26,9 +26,25 @@ router.get("/stats", authenticate, requireAdmin, async (_req: AuthRequest, res: 
 
 router.get("/all-comments", authenticate, requireAdmin, async (_req: AuthRequest, res: Response) => {
   try {
-    const comments = await db.select().from(commentsTable).orderBy(desc(commentsTable.createdAt));
-    res.json(comments);
-  } catch {
+    const rows = await db
+      .select({
+        id: commentsTable.id,
+        chapterId: commentsTable.chapterId,
+        userId: commentsTable.userId,
+        username: commentsTable.username,
+        text: commentsTable.text,
+        isHidden: commentsTable.isHidden,
+        createdAt: commentsTable.createdAt,
+        chapterNumber: chaptersTable.number,
+        seriesTitle: seriesTable.title,
+      })
+      .from(commentsTable)
+      .leftJoin(chaptersTable, eq(commentsTable.chapterId, chaptersTable.id))
+      .leftJoin(seriesTable, eq(chaptersTable.seriesId, seriesTable.id))
+      .orderBy(desc(commentsTable.createdAt));
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
