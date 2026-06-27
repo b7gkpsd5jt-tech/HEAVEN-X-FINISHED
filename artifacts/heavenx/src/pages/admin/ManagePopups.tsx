@@ -192,12 +192,14 @@ export default function ManagePopups() {
                     onMouseLeave={e => (e.currentTarget.style.color = "#555")}>
                     <Edit2 size={14} />
                   </button>
-                  <button onClick={() => handleDelete(p.id)}
-                    className="p-2 rounded-lg transition-all" style={{ color: "#555" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#ff6b6b")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "#555")}>
-                    <Trash2 size={14} />
-                  </button>
+                  {p.id !== "welcome-default" && (
+                    <button onClick={() => handleDelete(p.id)}
+                      className="p-2 rounded-lg transition-all" style={{ color: "#555" }}
+                      onMouseEnter={e => (e.currentTarget.style.color = "#ff6b6b")}
+                      onMouseLeave={e => (e.currentTarget.style.color = "#555")}>
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
