@@ -197,6 +197,22 @@ export default function ManageBanners() {
               </button>
             ))}
           </div>
+
+          <button
+            type="button"
+            onClick={saveSettings}
+            disabled={saving}
+            className="w-full py-2.5 text-sm font-semibold rounded-xl disabled:opacity-60 transition-all hover:scale-[1.01] active:scale-[0.99] mb-4"
+            style={{
+              background: "rgba(0,136,204,0.18)",
+              color: "#60cfff",
+              border: "1px solid rgba(0,136,204,0.45)",
+              boxShadow: "0 0 12px rgba(0,136,204,0.2)",
+            }}
+          >
+            {saving ? t("loading") : "✓ فونت و متن را ذخیره کن"}
+          </button>
+
           <h2 className="font-semibold mb-2 mt-4" style={{ color: "#f0f0f0" }}>Ankündigung (Homepage)</h2>
           <input
             value={announcement}
