@@ -49,7 +49,7 @@ export default function Navbar() {
               <span
                 dir="rtl"
                 style={{
-                  fontFamily: "'Vazirmatn', sans-serif",
+                  fontFamily: "'Reem Kufi', sans-serif",
                   fontWeight: 700,
                   fontSize: "1.15rem",
                   color: "#ffffff",

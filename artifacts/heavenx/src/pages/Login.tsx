@@ -117,7 +117,7 @@ export default function Login() {
           <h1
             dir="rtl"
             style={{
-              fontFamily: "'Noto Nastaliq Urdu', serif",
+              fontFamily: "'Reem Kufi', sans-serif",
               fontSize: "2.2rem",
               lineHeight: "1.5",
               color: "#f0f0f0",
