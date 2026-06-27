@@ -2,7 +2,7 @@ services:
   - type: web
     name: heavenx-api
     runtime: node
-    buildCommand: corepack enable && pnpm install --no-frozen-lockfile && npx tsc -p lib/db/tsconfig.json && cd artifacts/api-server && node build.mjs
+    buildCommand: npx pnpm@10 install --no-frozen-lockfile && npx tsc -p lib/db/tsconfig.json && cd artifacts/api-server && node build.mjs
     startCommand: node artifacts/api-server/dist/index.mjs
     plan: free
     envVars:
