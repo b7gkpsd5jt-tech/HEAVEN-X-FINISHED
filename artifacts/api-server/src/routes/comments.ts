@@ -1,7 +1,7 @@
 import { Router, Response, Request } from "express";
 import { db } from "@workspace/db";
-import { commentsTable, ratingsTable } from "@workspace/db";
-import { eq, and, avg, count } from "drizzle-orm";
+import { commentsTable, ratingsTable, chaptersTable } from "@workspace/db";
+import { eq, and, avg, count, desc, asc } from "drizzle-orm";
 import { authenticate, requireAdmin, AuthRequest } from "../lib/auth";
 
 const router = Router();
@@ -32,6 +32,33 @@ router.post("/chapter/:chapterId", authenticate, async (req: AuthRequest, res: R
     }).returning();
 
     res.status(201).json(comment);
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Public: all visible comments for all chapters of a series
+router.get("/series/:seriesId", async (req: Request, res: Response) => {
+  try {
+    const sort = req.query.sort === "oldest" ? "oldest" : "newest";
+    const rows = await db
+      .select({
+        id: commentsTable.id,
+        chapterId: commentsTable.chapterId,
+        userId: commentsTable.userId,
+        username: commentsTable.username,
+        text: commentsTable.text,
+        createdAt: commentsTable.createdAt,
+        chapterNumber: chaptersTable.number,
+      })
+      .from(commentsTable)
+      .innerJoin(chaptersTable, eq(commentsTable.chapterId, chaptersTable.id))
+      .where(and(
+        eq(chaptersTable.seriesId, req.params.seriesId),
+        eq(commentsTable.isHidden, "false"),
+      ))
+      .orderBy(sort === "oldest" ? asc(commentsTable.createdAt) : desc(commentsTable.createdAt));
+    res.json(rows);
   } catch {
     res.status(500).json({ error: "Internal server error" });
   }
