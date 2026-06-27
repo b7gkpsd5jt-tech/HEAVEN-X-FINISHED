@@ -364,16 +364,6 @@ export default function ManageSeries() {
                 />
               </div>
 
-              {/* Alt Title */}
-              <div>
-                <Label>Alt Title</Label>
-                <input
-                  value={form.altTitle}
-                  onChange={e => setForm(f => ({ ...f, altTitle: e.target.value }))}
-                  style={inputCls}
-                />
-              </div>
-
               {/* Translator Team + Artist */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
