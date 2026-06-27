@@ -1,7 +1,7 @@
 import { Router, Response } from "express";
 import { db } from "@workspace/db";
 import { ratingsTable } from "@workspace/db";
-import { eq, and, avg, count } from "drizzle-orm";
+import { eq, and, avg, count, sql } from "drizzle-orm";
 import { authenticate, AuthRequest } from "../lib/auth";
 
 const router = Router();
@@ -33,38 +33,26 @@ router.get("/chapter/:chapterId", authenticate, async (req: AuthRequest, res: Re
   }
 });
 
-// POST: upsert rating (1-5 stars)
+// POST: upsert rating (1-5 stars) — uses ON CONFLICT DO UPDATE for atomicity
 router.post("/chapter/:chapterId", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { stars } = req.body;
-    if (!stars || stars < 1 || stars > 5) {
-      res.status(400).json({ error: "Stars must be 1-5" });
+    const stars = Number(req.body.stars);
+    if (!stars || stars < 1 || stars > 5 || !Number.isInteger(stars)) {
+      res.status(400).json({ error: "Stars must be an integer 1-5" });
       return;
     }
 
-    const existing = await db
-      .select()
-      .from(ratingsTable)
-      .where(and(
-        eq(ratingsTable.chapterId, req.params.chapterId),
-        eq(ratingsTable.userId, req.user!.userId)
-      ))
-      .limit(1);
-
-    if (existing.length > 0) {
-      await db.update(ratingsTable)
-        .set({ stars })
-        .where(and(
-          eq(ratingsTable.chapterId, req.params.chapterId),
-          eq(ratingsTable.userId, req.user!.userId)
-        ));
-    } else {
-      await db.insert(ratingsTable).values({
+    await db
+      .insert(ratingsTable)
+      .values({
         chapterId: req.params.chapterId,
         userId: req.user!.userId,
         stars,
+      })
+      .onConflictDoUpdate({
+        target: [ratingsTable.chapterId, ratingsTable.userId],
+        set: { stars },
       });
-    }
 
     const [result] = await db
       .select({ average: avg(ratingsTable.stars), total: count() })
@@ -76,7 +64,8 @@ router.post("/chapter/:chapterId", authenticate, async (req: AuthRequest, res: R
       count: Number(result.total || 0),
       userRating: stars,
     });
-  } catch {
+  } catch (err) {
+    console.error("Rating upsert error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
