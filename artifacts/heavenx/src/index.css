@@ -204,6 +204,18 @@ input, textarea, select {
 }
 input::placeholder, textarea::placeholder { color: #555555; }
 
+/* ==================== BASE FONT (DE / EN) ==================== */
+body,
+button,
+input,
+textarea,
+select,
+p, span, div, a,
+h1, h2, h3, h4, h5, h6,
+label, li, td, th {
+  font-family: 'Exo 2', sans-serif;
+}
+
 /* ==================== PERSIAN (FA) FONT ==================== */
 .lang-fa *,
 .lang-fa input,
