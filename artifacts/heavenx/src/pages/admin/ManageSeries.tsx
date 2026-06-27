@@ -422,7 +422,7 @@ export default function ManageSeries() {
                 <Label>
                   <span className="flex items-center gap-1.5">
                     <Type size={11} style={{ display: "inline" }} />
-                    فونت نویسنده (Author Font)
+                    فونت منبع / تیم ترجمه
                   </span>
                 </Label>
                 <select
