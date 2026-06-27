@@ -215,9 +215,13 @@ input::placeholder, textarea::placeholder { color: #555555; }
 /* Auto-apply Lalezar for ANY Persian/Arabic character in any language mode */
 @font-face {
   font-family: 'LalezarAuto';
-  src: local('Lalezar');
-  unicode-range: U+0600-U+06FF, U+0750-U+077F, U+FB50-U+FDFF, U+FE70-U+FEFF,
-                 U+200C, U+200D, U+200F, U+060C, U+061B, U+061F;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/lalezar/v16/zrfl0HLVx-HwTP82YaL4IxL0.woff2) format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1,
+    U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF,
+    U+FE70-FE74, U+FE76-FEFC;
 }
 
 body,
